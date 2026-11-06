@@ -6,6 +6,7 @@ import { BandeiraUruguay } from "@/components/Bandeiras";
 import { MARCAS_SEO, CATEGORIAS_SEO } from "@/lib/seo-paginas";
 import { locaisDoIdioma, nomeLocal } from "@/lib/locais-seo";
 import { GUIAS } from "@/lib/guias";
+import { nomeModeloSeo, urlVeiculo, VEICULOS_UY } from "@/lib/veiculos-seo";
 import { useT } from "@/lib/idioma";
 import { SeletorIdioma } from "@/components/SeletorIdioma";
 import { CartaoApp } from "@/components/AppInstalavel";
@@ -213,6 +214,21 @@ export function SiteFooter() {
               {t("Repuestos", "Peças")} {m.marca}
             </a>
           ))}
+        </p>
+        <p className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <a
+            href="/vehiculos"
+            className="font-bold uppercase tracking-wider text-white hover:text-primary"
+          >
+            Por vehículo:
+          </a>
+          {VEICULOS_UY.slice(0, 8).flatMap((v) =>
+            v.modelos.slice(0, 2).map((m) => (
+              <a key={v.valor + m} href={urlVeiculo(v, m)} className="hover:text-white">
+                Repuestos {v.nome} {nomeModeloSeo(m)}
+              </a>
+            )),
+          )}
         </p>
         <p className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <span className="font-bold uppercase tracking-wider text-white">

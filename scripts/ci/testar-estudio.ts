@@ -6,21 +6,16 @@ import assert from "node:assert/strict";
 (async () => {
   const e = await import("../../src/lib/estudio.server");
 
-  // Fotos: só agrotrator e uploads próprios
-  // Só fotos do nosso servidor: link externo da agrotrator não é usado
-  assert.ok(!e.fotoPropria("https://agrotrator2.vteximg.com.br/arquivos/ids/1/peca.jpg"));
+  // Fotos: as do catálogo no Cloudflare R2 e as enviadas pelo admin (uploads/produtos)
+  const R2 = "https://pub-981d243748dc47d2af5a629f5f55278b.r2.dev/fotos/aaaljzbbVadjfKdj_1.jpg";
+  assert.ok(e.fotoPropria(R2));
+  assert.ok(!e.fotoPropria("https://pub-x.r2.dev/outra/coisa.jpg"));
+  assert.ok(!e.fotoPropria("https://exemplo.com/fotos/x.jpg"));
   const f = await import("../../src/lib/fotos");
-  assert.ok(f.fotoInvalida("https://agrotrator2.vteximg.com.br/arquivos/ids/1/peca.jpg"));
-  assert.ok(f.fotoInvalida("//www.agrotrator.com.br/x.jpg"));
+  assert.ok(!f.fotoInvalida(R2));
   assert.ok(f.fotoInvalida("https://redeparts.com.br/logo.jpg"));
   assert.ok(f.fotoInvalida(null));
-  assert.ok(!f.fotoInvalida("agrotrator/5003584-1.jpg"));
   assert.ok(!f.fotoInvalida("produtos/abc.jpg"));
-  // Em produção as fotos da agrotrator ficam copiadas no servidor: uploads/agrotrator/<sku>-1.jpg
-  assert.ok(e.fotoPropria("agrotrator/5003584-1.jpg"));
-  assert.ok(e.fotoPropria("/uploads/agrotrator/5003584-1.jpg"));
-  assert.ok(!e.fotoPropria("agrotrator/"));
-  assert.ok(!e.fotoPropria("https://exemplo.com/agrotrator/x.jpg"));
   assert.ok(e.fotoPropria("produtos/abc.jpg"));
   assert.ok(e.fotoPropria("/uploads/produtos/abc.jpg"));
   assert.ok(!e.fotoPropria("https://www.redeparts.com.br/foto.jpg"));

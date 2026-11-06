@@ -24,16 +24,16 @@ jobs:
         image: mysql:8.4
         env:
           MYSQL_ROOT_PASSWORD: ci
-          MYSQL_DATABASE: agro_ci
+          MYSQL_DATABASE: autopiezas_ci
         ports: ["3306:3306"]
         options: >-
           --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -pci"
           --health-interval=5s --health-timeout=5s --health-retries=30
     env:
       # Banco de teste descartável (o script de dados recusa bancos sem "ci"/"teste" no nome)
-      DATABASE_URL: mysql://root:ci@127.0.0.1:3306/agro_ci
+      DATABASE_URL: mysql://root:ci@127.0.0.1:3306/autopiezas_ci
       JWT_SECRET: ci-segredo-de-teste-com-mais-de-trinta-e-dois-caracteres
-      VITE_SITE_URL: https://agropartsuy.com
+      VITE_SITE_URL: https://autopiezasuy.com
       UPLOADS_DIR: ${{ github.workspace }}/.ci-uploads
     steps:
       - uses: actions/checkout@v5
@@ -66,14 +66,8 @@ jobs:
       - name: Limpeza das estatísticas (robôs de fora, contas internas, recorrentes, Valmet = Valtra)
         run: npx tsx scripts/ci/testar-limpeza-estatisticas.ts
 
-      - name: SEO fase 1 (títulos das peças, descrição com preço, cache, leads do Google)
+      - name: SEO (títulos das peças, descrição com preço e veículos, cache, leads do Google)
         run: npx tsx scripts/ci/testar-seo-leads.ts
-
-      - name: Endereços em português na versão /pt (/pt/pecas, /pt/pecas-agricolas)
-        run: npx tsx scripts/ci/testar-caminhos-pt.ts
-
-      - name: Cidades do RS, SC e PR com dados do IBGE (páginas e listas dos estados)
-        run: npx tsx scripts/ci/testar-municipios-sul.ts
 
       - name: Google Shopping no painel (Merchant Center falso)
         run: npx tsx scripts/ci/testar-merchant.ts

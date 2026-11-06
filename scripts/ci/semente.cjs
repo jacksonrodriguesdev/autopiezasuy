@@ -35,6 +35,15 @@ const H = 3600_000;
     });
   }
 
+  // Aplicações por veículo (buscador e páginas /vehiculos/volkswagen/gol)
+  await prisma.pecas_aplicacao.createMany({
+    data: [
+      { sku: "CI-001", montadora: "VOLKSWAGEN", veiculo: "GOL CITY TOTAL FLEX", ano: "2008-2014", motor: "1.6 8V" },
+      { sku: "CI-001", montadora: "VOLKSWAGEN", veiculo: "FOX PLUS", ano: "2010-2015", motor: "1.6 8V" },
+      { sku: "CI-002", montadora: "CHEVROLET", veiculo: "ONIX LT", ano: "2013-2019", motor: "1.4 8V" },
+    ],
+  });
+
   // Visitas: 2 sessões ontem (Rocha e Pelotas) e 1 hoje, com eventos. Dias no horário do Uruguai.
   const hojeUY = new Date(Date.now() - 3 * H).toISOString().slice(0, 10);
   const inicioHoje = Date.parse(`${hojeUY}T00:00:00-03:00`);

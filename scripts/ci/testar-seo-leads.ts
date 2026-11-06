@@ -52,18 +52,31 @@ async function main() {
   });
   assert.ok(d.includes("$U 1.420") || d.includes("$U 1420"), `preço: ${d}`);
   assert.ok(d.includes("P550148") && !d.includes("DAC") && d.length <= 160, `descrição: ${d}`);
-  // Português (Sul do Brasil): código na frente, preço em R$ e envio para RS, SC e PR
-  const tPt = tituloPeca(peca, "pt");
-  assert.ok(tPt.startsWith("30250100 · ") && tPt.length <= 60, `título pt: ${tPt}`);
-  const dPt = metaDescricaoPeca(peca, "pt", { precoBrl: 221.25 });
-  assert.ok(dPt.includes("R$ 221,25") && dPt.includes("RS, SC e PR") && dPt.length <= 160, dPt);
-  assert.ok(!dPt.includes("Uruguay") && !dPt.includes("DAC"), "português sem Uruguai");
+  // Veículos compatíveis entram no resumo (é o que deixa cada página única) e cabem em 160
+  const dv = metaDescricaoPeca(peca, "es", {
+    precoUyu: 1420,
+    equivalentes: ["P550148"],
+    veiculos: "Volkswagen Gol, Fox y Voyage",
+  });
+  assert.ok(
+    dv.includes("Para Volkswagen Gol, Fox y Voyage") && dv.length <= 160,
+    `veículos: ${dv}`,
+  );
+  const { resumirAplicacoes, fraseVeiculos } = await import("../../src/lib/aplicacoes-resumo");
+  const res = resumirAplicacoes([
+    { montadora: "VOLKSWAGEN", veiculo: "GOL SPECIAL", ano: "2001-2005" },
+    { montadora: "VOLKSWAGEN", veiculo: "GOL CITY TOTAL FLEX", ano: "2008-2012" },
+    { montadora: "MERCEDES BENZ", veiculo: "SPRINTER 311", ano: "2012" },
+  ]);
+  assert.equal(res[0].modelo, "Gol");
+  assert.equal(res[0].anoIni, 2001);
+  assert.equal(res[0].anoFim, 2012);
+  assert.equal(fraseVeiculos(res), "Volkswagen Gol y Mercedes-Benz Sprinter");
 
-  // ---- Feed do Google Shopping para o Brasil (R$, /pt)
+  // ---- Feed do Google Shopping do Uruguai (pesos)
   const { feedGoogle } = await import("../../src/lib/feed-google.server");
-  const fbr = await feedGoogle("BR");
-  assert.ok(fbr.xml.includes("Peças agrícolas"), "feed BR em português");
-  assert.ok(!/ UYU<\/g:price>/.test(fbr.xml), "feed BR sem preço em pesos");
+  const fuy = await feedGoogle("UY");
+  assert.ok(!/ BRL<\/g:price>/.test(fuy.xml), "feed UY sem preço em reais");
 
   // ---- Lista guardada: venceu → entrega o valor antigo e recalcula por trás
   const { emCache } = await import("../../src/lib/cache.server");
@@ -150,7 +163,9 @@ async function main() {
       vel.porTipo.some((t) => t.tipo === "Peça (pt)"),
       "tipo de página",
     );
-    console.log("ok: SEO (títulos es/pt, descrição, feed BR, lista guardada, leads, velocidade)");
+    console.log(
+      "ok: SEO (título, descrição com veículos, feed UY, lista guardada, leads, velocidade)",
+    );
   } finally {
     await limpar();
     await prisma.$disconnect();

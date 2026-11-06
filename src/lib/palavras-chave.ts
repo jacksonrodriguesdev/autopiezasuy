@@ -4,6 +4,7 @@
 // Só Uruguai, só espanhol. Código puro (roda no admin).
 import { MARCAS_SEO, CATEGORIAS_SEO, PECAS_SEO } from "./seo-paginas";
 import { LOCAIS_SEO, type LocalSeo } from "./locais-seo";
+import { VEICULOS_UY, urlVeiculo } from "./veiculos-seo";
 
 export type Grupo =
   | "Autoridade"
@@ -42,136 +43,6 @@ const LOCAIS_PRIORIDADE = new Set([
   "rivera",
 ]);
 
-// Veículos mais comuns no Uruguai. valor = montadora no banco (pecas_aplicacao), modelos = primeira
-// palavra do veículo cadastrado (é o que o buscador por veículo usa: /loja?auto=&modelo=)
-export const VEICULOS_UY: Array<{
-  valor: string;
-  nome: string;
-  apelidos: string[];
-  modelos: string[];
-}> = [
-  {
-    valor: "VOLKSWAGEN",
-    nome: "Volkswagen",
-    apelidos: ["volkswagen", "vw"],
-    modelos: [
-      "GOL",
-      "FOX",
-      "VOYAGE",
-      "SAVEIRO",
-      "AMAROK",
-      "UP",
-      "POLO",
-      "GOLF",
-      "SURAN",
-      "BORA",
-      "VENTO",
-    ],
-  },
-  {
-    valor: "CHEVROLET",
-    nome: "Chevrolet",
-    apelidos: ["chevrolet", "chevy"],
-    modelos: [
-      "ONIX",
-      "PRISMA",
-      "CORSA",
-      "CELTA",
-      "S10",
-      "SPIN",
-      "CRUZE",
-      "AGILE",
-      "CLASSIC",
-      "MONTANA",
-      "TRACKER",
-    ],
-  },
-  {
-    valor: "FIAT",
-    nome: "Fiat",
-    apelidos: ["fiat"],
-    modelos: [
-      "UNO",
-      "PALIO",
-      "SIENA",
-      "STRADA",
-      "FIORINO",
-      "CRONOS",
-      "MOBI",
-      "TORO",
-      "ARGO",
-      "DUCATO",
-      "PUNTO",
-    ],
-  },
-  {
-    valor: "FORD",
-    nome: "Ford",
-    apelidos: ["ford"],
-    modelos: ["FIESTA", "KA", "FOCUS", "RANGER", "ECOSPORT", "COURIER", "TRANSIT"],
-  },
-  {
-    valor: "RENAULT",
-    nome: "Renault",
-    apelidos: ["renault"],
-    modelos: ["CLIO", "SANDERO", "LOGAN", "KANGOO", "DUSTER", "MEGANE", "SYMBOL", "KWID", "OROCH"],
-  },
-  {
-    valor: "PEUGEOT",
-    nome: "Peugeot",
-    apelidos: ["peugeot"],
-    modelos: ["206", "207", "208", "307", "308", "PARTNER", "2008", "3008"],
-  },
-  {
-    valor: "TOYOTA",
-    nome: "Toyota",
-    apelidos: ["toyota"],
-    modelos: ["HILUX", "COROLLA", "ETIOS", "YARIS", "SW4", "RAV4"],
-  },
-  {
-    valor: "CITROEN",
-    nome: "Citroën",
-    apelidos: ["citroen"],
-    modelos: ["C3", "C4", "BERLINGO", "XSARA", "AIRCROSS"],
-  },
-  {
-    valor: "HYUNDAI",
-    nome: "Hyundai",
-    apelidos: ["hyundai"],
-    modelos: ["HB20", "ACCENT", "TUCSON", "CRETA", "I30", "H1", "HR"],
-  },
-  {
-    valor: "NISSAN",
-    nome: "Nissan",
-    apelidos: ["nissan"],
-    modelos: ["MARCH", "VERSA", "FRONTIER", "SENTRA", "TIIDA", "KICKS"],
-  },
-  {
-    valor: "HONDA",
-    nome: "Honda",
-    apelidos: ["honda"],
-    modelos: ["CIVIC", "FIT", "CITY", "HR-V", "CR-V"],
-  },
-  {
-    valor: "KIA",
-    nome: "Kia",
-    apelidos: ["kia"],
-    modelos: ["PICANTO", "RIO", "SPORTAGE", "CERATO"],
-  },
-  {
-    valor: "MITSUBISHI",
-    nome: "Mitsubishi",
-    apelidos: ["mitsubishi"],
-    modelos: ["L200", "PAJERO", "LANCER", "OUTLANDER"],
-  },
-  {
-    valor: "MERCEDES BENZ",
-    nome: "Mercedes-Benz",
-    apelidos: ["mercedes benz", "mercedes"],
-    modelos: ["SPRINTER", "ACCELO", "ATEGO", "AXOR", "CLASSE"],
-  },
-];
-
 // Peças mais buscadas por modelo (cauda longa, alta intenção de compra)
 const PECAS_MODELO = [
   "repuestos",
@@ -188,8 +59,6 @@ const PECAS_MODELO = [
 
 const baixo = (s: string) =>
   s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " ").trim();
-const veiculoUrl = (v: string, modelo?: string) =>
-  `/loja?auto=${encodeURIComponent(v)}${modelo ? `&modelo=${encodeURIComponent(modelo)}` : ""}`;
 
 export function gerarPalavras(
   opc: { buscasReais?: Array<{ termo: string; vezes: number }> } = {},
@@ -302,10 +171,10 @@ export function gerarPalavras(
           grupo: "Veículo",
           prioridade: i < 2 ? 1 : 2,
           correspondencia: i < 2 ? "Exata" : "Frase",
-          destino: veiculoUrl(v.valor),
+          destino: urlVeiculo(v),
           campanha: "UY | Pesquisa | Vehículos",
           grupoAnuncio: v.nome,
-          uso: "Ads",
+          uso: "SEO + Ads",
         }),
       );
     }
@@ -323,10 +192,10 @@ export function gerarPalavras(
           grupo: "Modelo",
           prioridade: prio,
           correspondencia: "Frase",
-          destino: veiculoUrl(v.valor, mod),
+          destino: urlVeiculo(v, mod),
           campanha: "UY | Pesquisa | Modelos",
           grupoAnuncio: `${v.nome} ${mod}`,
-          uso: "Ads",
+          uso: "SEO + Ads",
         });
         if (i < 3)
           add({
@@ -334,10 +203,10 @@ export function gerarPalavras(
             grupo: "Modelo",
             prioridade: 3,
             correspondencia: "Frase",
-            destino: veiculoUrl(v.valor, mod),
+            destino: urlVeiculo(v, mod),
             campanha: "UY | Pesquisa | Modelos",
             grupoAnuncio: `${v.nome} ${mod}`,
-            uso: "Ads",
+            uso: "SEO + Ads",
           });
       });
     });

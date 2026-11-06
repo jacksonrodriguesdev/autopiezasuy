@@ -1,6 +1,7 @@
 # Vendas, etiquetas e avaliações (cupom de 15%)
 
 ## Como funciona
+
 1. **Admin → Vendas e etiquetas → Nova venda**: cliente (ou buscar a conta do site), país, peças
    (busca no catálogo com o preço do dia, valor editável) e envio. Ao salvar: imprimir etiqueta
    10×15 cm (térmica) ou A4, mandar o link pelo WhatsApp ou copiar.
@@ -21,6 +22,7 @@ Tabelas `vendas` e `avaliacoes` são criadas sozinhas (`garantirTabelasAvaliacoe
 Teste: `scripts/ci/testar-avaliacoes.ts` (no CI).
 
 ## Próximas fases
+
 - **Fase 2 (mais avaliações):** e-mail automático ~7 dias após a venda («já chegou? avalie e ganhe
   15%») pelas automações; avaliação também para quem paga pelo link de pagamento; lembrete no
   WhatsApp.

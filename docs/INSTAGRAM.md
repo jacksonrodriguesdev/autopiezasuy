@@ -66,7 +66,7 @@ Com o Facebook conectado, o painel:
    `META_APP_ID` e `META_APP_SECRET` (a chave só no hPanel). Reinicie o app.
 3. Se o Login para Empresas pedir uma «configuração», crie uma com as permissões
    `pages_show_list, pages_read_engagement, pages_manage_posts, read_insights, ads_read,
-   ads_management, business_management` e coloque o ID dela em `META_LOGIN_CONFIG_ID`.
+ads_management, business_management` e coloque o ID dela em `META_LOGIN_CONFIG_ID`.
 4. Admin → Instagram e Facebook → **Conectar Facebook** → escolha a **página** e a **conta de
    anúncios**.
 

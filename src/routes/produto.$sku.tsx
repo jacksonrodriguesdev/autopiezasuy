@@ -52,6 +52,7 @@ import { avaliacoesProdutoFn } from "@/lib/avaliacoes";
 import { AvaliacoesPeca, ResumoEstrelas } from "@/components/AvaliacoesPeca";
 import { fotoInvalida } from "@/lib/fotos";
 import { MARCAS_SEO, CATEGORIAS_SEO } from "@/lib/seo-paginas";
+import { anosTexto, fraseVeiculos, resumirAplicacoes } from "@/lib/aplicacoes-resumo";
 
 const SITE = SITE_URL;
 const urlImagem = (p: string) =>
@@ -99,11 +100,19 @@ export const Route = createFileRoute("/produto/$sku")({
     const precoMeta = loaderData.precos?.mostrar
       ? precoDoPais(precoVenda(p, loaderData.precos), idioma)
       : null;
+    // Vehículos compatibles: deixam o resumo e os dados estruturados únicos para cada peça
+    const veiculos = resumirAplicacoes((p as any).aplicacoes);
+    const similares = ((p as any).similares ?? []) as Array<{ codigo_similar: string }>;
     const desc = metaDescricaoPeca(p, idioma, {
       precoUyu: precoMeta?.uyu ?? null,
       precoBrl: precoMeta?.brl ?? null,
-      equivalentes: (p.variantes ?? []).map((v) => v.codigo_fabricante ?? "").filter(Boolean),
+      equivalentes: [
+        ...(p.variantes ?? []).map((v) => v.codigo_fabricante ?? ""),
+        ...similares.map((s) => s.codigo_similar),
+      ].filter(Boolean),
+      veiculos: veiculos.length ? fraseVeiculos(veiculos) : undefined,
     });
+    const ean = String((p as any).ean ?? "").replace(/\D/g, "");
     const caminho = `/produto/${encodeURIComponent(p.sku)}`;
     const url = `${SITE}${comPrefixo(caminho, idioma)}`;
     // "redeparts" é o logo do fornecedor usado como foto provisória: não serve como imagem da peça
@@ -120,7 +129,18 @@ export const Route = createFileRoute("/produto/$sku")({
       name: nome,
       sku: p.sku,
       mpn: codigo,
+      ...(ean.length >= 8 && ean.length <= 14 && { gtin: ean }),
       ...(imagem && { image: [imagem] }),
+      // Para quais vehículos sirve (schema.org: repuesto de un Car)
+      ...(veiculos.length && {
+        isAccessoryOrSparePartFor: veiculos.slice(0, 10).map((v) => ({
+          "@type": "Car",
+          name: `${v.marca} ${v.modelo}`,
+          brand: { "@type": "Brand", name: v.marca },
+          model: v.modelo,
+          ...(v.anoIni && { vehicleModelDate: String(v.anoIni) }),
+        })),
+      }),
       description: descricaoNo(p, idioma),
       category: categoriaNo(p.categoria, idioma) || undefined,
       ...(marca && { brand: { "@type": "Brand", name: marca } }),
@@ -570,8 +590,40 @@ function ProductDetail() {
 
             {p.aplicacoes?.length > 0 && (
               <div className="mt-6 rounded-xl border bg-white p-5">
+                {/* Resumo por modelo: texto único da peça e atalho para a loja filtrada */}
+                {(() => {
+                  const veic = resumirAplicacoes(p.aplicacoes);
+                  if (!veic.length) return null;
+                  return (
+                    <div className="mb-5">
+                      <h2 className="mb-1.5 text-base font-bold">
+                        ¿Sirve para mi auto? Vehículos compatibles
+                      </h2>
+                      <p className="mb-3 text-sm text-zinc-600">
+                        {nome} código {codigo} sirve para {fraseVeiculos(veic, 4)}
+                        {veic.length > 4 ? " y otros modelos" : ""}. Revisá el año y el motor en la
+                        tabla o consultanos por WhatsApp.
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {veic.map((v) => (
+                          <Link
+                            key={`${v.valor}|${v.modelo}`}
+                            to="/loja"
+                            search={{ auto: v.valor, modelo: v.modelo.toUpperCase() } as never}
+                            className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-[13px] font-semibold text-zinc-700 transition hover:border-primary/40 hover:text-primary"
+                          >
+                            {v.marca} {v.modelo}
+                            {anosTexto(v) && (
+                              <span className="ml-1 font-normal text-zinc-400">{anosTexto(v)}</span>
+                            )}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
                 <h2 className="mb-4 text-base font-bold">
-                  {t("Aplicaciones (vehículos compatibles)", "Aplicações (tratores compatíveis)")}
+                  {t("Aplicaciones (vehículos compatibles)", "Aplicações (veículos compatíveis)")}
                 </h2>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-sm">

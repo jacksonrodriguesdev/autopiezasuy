@@ -4,17 +4,18 @@ Peças, preços (+50%) e fotos vindos do agrotrator.com.br (loja VTEX).
 
 ## O que os scripts fazem
 
-| Passo | Script | Saída |
-|---|---|---|
-| 1. Baixar o catálogo (título, marca, categorias, preço, estoque, descrição, fotos) | `node scripts/extratores/agrotrator_precos.cjs` | `dados/precos_agrotrator/catalogo.json` |
-| 2. Achar fotos que são só a logo do agrotrator | `node scripts/extratores/agrotrator_fotos_logo.cjs` | `dados/precos_agrotrator/fotos_logo.json` |
-| 3. Importar no banco local (simulação sem `--aplicar`) | `node scripts/catalogo/importar_agrotrator_completo.cjs --aplicar` | banco local + backup em `dados/` + SQL |
-| 3b. Só gerar o SQL de novo (banco local já importado) | `node scripts/catalogo/importar_agrotrator_completo.cjs --so-sql` | `scripts/importacao/agrotrator_completo_producao_N.sql` |
-| 4. Tirar as logos do banco local (pelo tamanho do arquivo) | `node scripts/catalogo/remover_logos_agrotrator.cjs --aplicar` | banco local |
-| 5. Achar as logos que sobraram pelo CONTEÚDO da imagem | `node scripts/extratores/achar_logos_hash.cjs --logo=<url>...` | `dados/precos_agrotrator/logos_hash.json` |
-| 6. Tirar essas logos (local + SQL de produção) | `node scripts/catalogo/limpar_logos_hash.cjs --aplicar` | banco local + `scripts/importacao/remover_logos_producao.sql` |
+| Passo                                                                              | Script                                                             | Saída                                                         |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------- |
+| 1. Baixar o catálogo (título, marca, categorias, preço, estoque, descrição, fotos) | `node scripts/extratores/agrotrator_precos.cjs`                    | `dados/precos_agrotrator/catalogo.json`                       |
+| 2. Achar fotos que são só a logo do agrotrator                                     | `node scripts/extratores/agrotrator_fotos_logo.cjs`                | `dados/precos_agrotrator/fotos_logo.json`                     |
+| 3. Importar no banco local (simulação sem `--aplicar`)                             | `node scripts/catalogo/importar_agrotrator_completo.cjs --aplicar` | banco local + backup em `dados/` + SQL                        |
+| 3b. Só gerar o SQL de novo (banco local já importado)                              | `node scripts/catalogo/importar_agrotrator_completo.cjs --so-sql`  | `scripts/importacao/agrotrator_completo_producao_N.sql`       |
+| 4. Tirar as logos do banco local (pelo tamanho do arquivo)                         | `node scripts/catalogo/remover_logos_agrotrator.cjs --aplicar`     | banco local                                                   |
+| 5. Achar as logos que sobraram pelo CONTEÚDO da imagem                             | `node scripts/extratores/achar_logos_hash.cjs --logo=<url>...`     | `dados/precos_agrotrator/logos_hash.json`                     |
+| 6. Tirar essas logos (local + SQL de produção)                                     | `node scripts/catalogo/limpar_logos_hash.cjs --aplicar`            | banco local + `scripts/importacao/remover_logos_producao.sql` |
 
 Regras:
+
 - Peça que já temos com o **mesmo SKU**: ganha preço e, se não tem foto visível, as fotos de lá.
 - Peça com o mesmo código original de **outro fabricante**: não mexe.
 - Peça que não temos: entra como nova (descrição gerada; título em espanhol feito pelo site).

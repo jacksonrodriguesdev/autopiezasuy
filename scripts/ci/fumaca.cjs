@@ -4,59 +4,46 @@ const BASE = (process.env.BASE_URL || "http://localhost:3000").replace(/\/$/, ""
 
 // [caminho, status esperado, textos que precisam aparecer]
 const PAGINAS = [
-  ["/", 200, ["AUTO PIEZAS UY", "<h1"]],
+  ["/", 200, ["AUTO PIEZAS UY", "<h1", 'lang="es-UY"', "Elegí tu vehículo"]],
   ["/loja", 200, ["CI-0"]],
-  // Duas versões, cada uma de um país: espanhol = Uruguai, português = Sul do Brasil (RS, SC e PR)
-  ["/pt", 200, ['lang="pt-BR"', 'hrefLang="es-UY"', "Santa Catarina", "/manifest-pt.webmanifest"]],
+  // Site só em espanhol (Uruguai): a versão antiga em português redireciona
+  ["/pt", 301, []],
+  ["/pt/loja", 301, []],
   // App instalável (PWA) e chave das notificações push
   ["/sw.js", 200, ["notificationclick", "/offline.html"]],
   ["/offline.html", 200, ["Sin conexión"]],
-  ["/manifest-pt.webmanifest", 200, ['"start_url": "/pt']],
+  ["/manifest.webmanifest", 200, ['"lang": "es-UY"']],
   ["/api/public/push", 200, ['"chave"']],
   ["/app", 200, ["AUTO PIEZAS UY en tu celular"]],
-  ["/pt/app", 200, ["A AUTO PIEZAS UY no seu celular", "/manifest-pt.webmanifest"]],
-  ["/produto/CI-001", 200, ["CI-001", "application/ld+json"]],
-  ["/pt/produto/CI-001", 200, ["CI-001"]],
-  ["/repuestos", 200, ["John Deere"]],
-  ["/repuestos/john-deere", 200, ["John Deere"]],
-  ["/repuestos/filtros", 200, ["Filtros"]],
-  ["/pt/pecas/colheitadeiras", 200, ["colheitadeiras"]],
-  ["/pt/pecas/john-deere/vedacoes", 200, ["John Deere"]],
-  // Endereço antigo da versão em português (em espanhol) leva ao novo
-  ["/pt/repuestos/cosechadoras", 301, []],
-  ["/repuestos/radiadores", 200, ["Radiadores"]],
-  ["/repuestos-autos", 200, ["Departamentos"]],
-  ["/repuestos-autos/rocha", 200, ["Repuestos agrícolas en Rocha"]],
-  ["/pt/pecas-agricolas", 200, ["Paraná"]],
-  ["/pt/pecas-agricolas/pelotas", 200, ["Peças agrícolas em Pelotas", "/pt/pecas-agricolas/"]],
-  ["/pt/pecas-agricolas/chapeco", 200, ["– SC"]],
-  // Cidade gerada dos dados do IBGE e lista de municípios do estado
-  ["/pt/pecas-agricolas/abelardo-luz", 200, ["Peças agrícolas em Abelardo Luz – SC", "IBGE"]],
-  ["/pt/pecas-agricolas/rio-grande-do-sul", 200, ["Enviamos para as 497 cidades", "Aceguá"]],
-  ["/pt/pecas-agricolas/cidade-que-nao-existe", 404, []],
-  ["/pt/repuestos-autos/pelotas", 301, []],
-  // Local na língua do outro país leva para a certa
-  ["/repuestos-autos/pelotas", 301, []],
-  ["/pt/pecas-agricolas/rocha", 301, []],
+  ["/produto/CI-001", 200, ["CI-001", "application/ld+json", "Vehículos compatibles", "Volkswagen Gol"]],
+  ["/repuestos", 200, ["Bosch"]],
+  ["/repuestos/bosch", 200, ["Bosch"]],
+  ["/repuestos/frenos", 200, ["Frenos"]],
+  ["/repuestos/pastillas-de-freno", 200, ["Pastillas de freno"]],
+  ["/repuestos/no-existe-ci", 404, []],
+  // Páginas por veículo
+  ["/vehiculos", 200, ["Repuestos por marca y modelo", "/vehiculos/volkswagen/gol"]],
+  ["/vehiculos/volkswagen/gol", 200, ["Repuestos para Volkswagen Gol", "CI-001", "application/ld+json"]],
+  ["/vehiculos/marca-que-nao-existe/x", 404, []],
+  // Páginas por local (só Uruguai)
+  ["/repuestos-autos", 200, ["<h1"]],
+  ["/repuestos-autos/montevideo", 200, ["Repuestos para autos en Montevideo"]],
+  ["/repuestos-autos/pelotas", 404, []],
   ["/catalogos", 200, ["<h1"]],
   ["/ayuda", 200, ["<h1"]],
   ["/guias", 200, ["Guías"]],
-  ["/pt/guias/valtra-o-valmet", 200, ["Valtra ou Valmet"]],
+  ["/guias/cuando-cambiar-las-pastillas-de-freno", 200, ["pastillas"]],
   ["/cotizar", 200, ["<h1"]],
-  ["/pt/orcamento", 200, ["<h1"]],
-  ["/pt/ajuda", 200, ["<h1"]],
   ["/pedido-rapido", 200, []],
   ["/login", 200, []],
   ["/cadastro", 200, []],
   ["/sitemap.xml", 200, ["<sitemapindex"]],
-  ["/sitemaps/paginas.xml", 200, ["/repuestos-autos/rocha", "/pt/pecas-agricolas/pelotas", "/pt/pecas/vedacoes", "/pt/pecas-agricolas/abelardo-luz"]],
+  ["/sitemaps/paginas.xml", 200, ["/repuestos-autos/montevideo", "/vehiculos/volkswagen/gol", "/repuestos/bosch"]],
   ["/sitemaps/pecas-1.xml", 200, ["CI-001"]],
-  ["/robots.txt", 200, ["Sitemap"]],
+  ["/robots.txt", 200, ["Sitemap", "Disallow: /admin"]],
   ["/feeds/google-merchant.xml", 200, ["<?xml"]],
-  ["/feeds/google-merchant-br.xml", 200, ["<?xml"]],
   ["/feeds/meta-catalogo.xml", 200, ["<?xml"]],
   ["/pagar/link-que-nao-existe", 200, ["Link no encontrado"]],
-  ["/pt/pagar/link-que-nao-existe", 200, ["Link não encontrado"]],
   ["/pagina-que-nao-existe-ci", 404, []],
 ];
 // Sinais de página quebrada (tela de erro do React/TanStack)
@@ -97,7 +84,7 @@ const QUEBRADA = [/Something went wrong/i, /Algo salió mal/i, /Algo deu errado/
   // WhatsApp das cotações: todo link do WhatsApp nas páginas principais vai para o número certo
   // (+55 47 99191-9365). Um dígito a menos e nenhuma cotação chega.
   const WHATSAPP = "5547991919365";
-  for (const caminho of ["/", "/produto/CI-001", "/repuestos-autos/rocha", "/pt"]) {
+  for (const caminho of ["/", "/produto/CI-001", "/repuestos-autos/montevideo", "/vehiculos/volkswagen/gol"]) {
     const html = await (await fetch(BASE + caminho)).text();
     const numeros = [...html.matchAll(/api\.whatsapp\.com\/send\?phone=(\d+)/g)].map((m) => m[1]);
     const errados = numeros.filter((n) => n !== WHATSAPP);
@@ -106,11 +93,8 @@ const QUEBRADA = [/Something went wrong/i, /Algo salió mal/i, /Algo deu errado/
     if (!ok) falhas.push(`${caminho}: WhatsApp ${numeros.length ? `com número errado (${[...new Set(errados)]})` : "sem link"}`);
   }
 
-  // Uma moeda por país: português (Brasil) só R$, espanhol (Uruguai) só $U
-  for (const [caminho, certa, errada] of [
-    ["/pt/produto/CI-001", "R$", /\$U\s?\d/],
-    ["/produto/CI-001", "$U", /R\$\s?\d/],
-  ]) {
+  // Preço só em pesos uruguaios ($U), nunca em reais
+  for (const [caminho, certa, errada] of [["/produto/CI-001", "$U", /R\$\s?\d/]]) {
     const html = await (await fetch(BASE + caminho)).text();
     const ok = html.includes(certa) && !errada.test(html);
     console.log(`${ok ? "✔" : "✘"} moeda em ${caminho}: ${ok ? `só ${certa}` : "moeda errada ou sem preço"}`);

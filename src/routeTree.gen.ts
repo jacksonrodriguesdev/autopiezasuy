@@ -75,6 +75,7 @@ import { Route as RepuestosIndexRouteImport } from './routes/repuestos.index'
 import { Route as RepuestosSlugRouteImport } from './routes/repuestos.$slug'
 import { Route as SitemapsArquivoRouteImport } from './routes/sitemaps.$arquivo'
 import { Route as UploadsSplatRouteImport } from './routes/uploads.$'
+import { Route as VehiculosIndexRouteImport } from './routes/vehiculos.index'
 import { Route as AdminAutomacoesIndexRouteImport } from './routes/admin.automacoes.index'
 import { Route as AdminAutomacoesIdRouteImport } from './routes/admin.automacoes.$id'
 import { Route as AdminEmailsIndexRouteImport } from './routes/admin.emails.index'
@@ -109,6 +110,7 @@ import { Route as ApiPublicTrackRouteImport } from './routes/api/public/track'
 import { Route as CatalogosArchivoIdRouteImport } from './routes/catalogos.archivo.$id'
 import { Route as CatalogosVerIdRouteImport } from './routes/catalogos.ver.$id'
 import { Route as RepuestosSlugSubRouteImport } from './routes/repuestos.$slug_.$sub'
+import { Route as VehiculosMarcaModeloRouteImport } from './routes/vehiculos.$marca.$modelo'
 import { Route as ApiAdminBannersIdRouteImport } from './routes/api/admin/banners.$id'
 import { Route as ApiAdminBannersUploadRouteImport } from './routes/api/admin/banners.upload'
 import { Route as ApiAdminCatalogosUploadRouteImport } from './routes/api/admin/catalogos.upload'
@@ -467,6 +469,11 @@ const UploadsSplatRoute = UploadsSplatRouteImport.update({
   path: '/uploads/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VehiculosIndexRoute = VehiculosIndexRouteImport.update({
+  id: '/vehiculos/',
+  path: '/vehiculos/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminAutomacoesIndexRoute = AdminAutomacoesIndexRouteImport.update({
   id: '/automacoes/',
   path: '/automacoes/',
@@ -636,6 +643,11 @@ const CatalogosVerIdRoute = CatalogosVerIdRouteImport.update({
 const RepuestosSlugSubRoute = RepuestosSlugSubRouteImport.update({
   id: '/repuestos/$slug_/$sub',
   path: '/repuestos/$slug/$sub',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VehiculosMarcaModeloRoute = VehiculosMarcaModeloRouteImport.update({
+  id: '/vehiculos/$marca/$modelo',
+  path: '/vehiculos/$marca/$modelo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAdminBannersIdRoute = ApiAdminBannersIdRouteImport.update({
@@ -848,6 +860,7 @@ export interface FileRoutesByFullPath {
   '/guias/': typeof GuiasIndexRoute
   '/repuestos-autos/': typeof RepuestosAutosIndexRoute
   '/repuestos/': typeof RepuestosIndexRoute
+  '/vehiculos/': typeof VehiculosIndexRoute
   '/admin/automacoes/$id': typeof AdminAutomacoesIdRoute
   '/admin/emails/$id': typeof AdminEmailsIdRoute
   '/admin/emails/analise': typeof AdminEmailsAnaliseRoute
@@ -879,6 +892,7 @@ export interface FileRoutesByFullPath {
   '/catalogos/archivo/$id': typeof CatalogosArchivoIdRoute
   '/catalogos/ver/$id': typeof CatalogosVerIdRoute
   '/repuestos/$slug/$sub': typeof RepuestosSlugSubRoute
+  '/vehiculos/$marca/$modelo': typeof VehiculosMarcaModeloRoute
   '/admin/automacoes/': typeof AdminAutomacoesIndexRoute
   '/admin/emails/': typeof AdminEmailsIndexRoute
   '/admin/extratos/': typeof AdminExtratosIndexRoute
@@ -976,6 +990,7 @@ export interface FileRoutesByTo {
   '/guias': typeof GuiasIndexRoute
   '/repuestos-autos': typeof RepuestosAutosIndexRoute
   '/repuestos': typeof RepuestosIndexRoute
+  '/vehiculos': typeof VehiculosIndexRoute
   '/admin/automacoes/$id': typeof AdminAutomacoesIdRoute
   '/admin/emails/$id': typeof AdminEmailsIdRoute
   '/admin/emails/analise': typeof AdminEmailsAnaliseRoute
@@ -1007,6 +1022,7 @@ export interface FileRoutesByTo {
   '/catalogos/archivo/$id': typeof CatalogosArchivoIdRoute
   '/catalogos/ver/$id': typeof CatalogosVerIdRoute
   '/repuestos/$slug/$sub': typeof RepuestosSlugSubRoute
+  '/vehiculos/$marca/$modelo': typeof VehiculosMarcaModeloRoute
   '/admin/automacoes': typeof AdminAutomacoesIndexRoute
   '/admin/emails': typeof AdminEmailsIndexRoute
   '/admin/extratos': typeof AdminExtratosIndexRoute
@@ -1106,6 +1122,7 @@ export interface FileRoutesById {
   '/guias/': typeof GuiasIndexRoute
   '/repuestos-autos/': typeof RepuestosAutosIndexRoute
   '/repuestos/': typeof RepuestosIndexRoute
+  '/vehiculos/': typeof VehiculosIndexRoute
   '/admin/automacoes/$id': typeof AdminAutomacoesIdRoute
   '/admin/emails/$id': typeof AdminEmailsIdRoute
   '/admin/emails/analise': typeof AdminEmailsAnaliseRoute
@@ -1137,6 +1154,7 @@ export interface FileRoutesById {
   '/catalogos/archivo/$id': typeof CatalogosArchivoIdRoute
   '/catalogos/ver/$id': typeof CatalogosVerIdRoute
   '/repuestos/$slug_/$sub': typeof RepuestosSlugSubRoute
+  '/vehiculos/$marca/$modelo': typeof VehiculosMarcaModeloRoute
   '/admin/automacoes/': typeof AdminAutomacoesIndexRoute
   '/admin/emails/': typeof AdminEmailsIndexRoute
   '/admin/extratos/': typeof AdminExtratosIndexRoute
@@ -1237,6 +1255,7 @@ export interface FileRouteTypes {
     | '/guias/'
     | '/repuestos-autos/'
     | '/repuestos/'
+    | '/vehiculos/'
     | '/admin/automacoes/$id'
     | '/admin/emails/$id'
     | '/admin/emails/analise'
@@ -1268,6 +1287,7 @@ export interface FileRouteTypes {
     | '/catalogos/archivo/$id'
     | '/catalogos/ver/$id'
     | '/repuestos/$slug/$sub'
+    | '/vehiculos/$marca/$modelo'
     | '/admin/automacoes/'
     | '/admin/emails/'
     | '/admin/extratos/'
@@ -1365,6 +1385,7 @@ export interface FileRouteTypes {
     | '/guias'
     | '/repuestos-autos'
     | '/repuestos'
+    | '/vehiculos'
     | '/admin/automacoes/$id'
     | '/admin/emails/$id'
     | '/admin/emails/analise'
@@ -1396,6 +1417,7 @@ export interface FileRouteTypes {
     | '/catalogos/archivo/$id'
     | '/catalogos/ver/$id'
     | '/repuestos/$slug/$sub'
+    | '/vehiculos/$marca/$modelo'
     | '/admin/automacoes'
     | '/admin/emails'
     | '/admin/extratos'
@@ -1494,6 +1516,7 @@ export interface FileRouteTypes {
     | '/guias/'
     | '/repuestos-autos/'
     | '/repuestos/'
+    | '/vehiculos/'
     | '/admin/automacoes/$id'
     | '/admin/emails/$id'
     | '/admin/emails/analise'
@@ -1525,6 +1548,7 @@ export interface FileRouteTypes {
     | '/catalogos/archivo/$id'
     | '/catalogos/ver/$id'
     | '/repuestos/$slug_/$sub'
+    | '/vehiculos/$marca/$modelo'
     | '/admin/automacoes/'
     | '/admin/emails/'
     | '/admin/extratos/'
@@ -1589,6 +1613,7 @@ export interface RootRouteChildren {
   GuiasIndexRoute: typeof GuiasIndexRoute
   RepuestosAutosIndexRoute: typeof RepuestosAutosIndexRoute
   RepuestosIndexRoute: typeof RepuestosIndexRoute
+  VehiculosIndexRoute: typeof VehiculosIndexRoute
   ApiAdminBannersRoute: typeof ApiAdminBannersRouteWithChildren
   ApiAdminCategoriesRoute: typeof ApiAdminCategoriesRouteWithChildren
   ApiAdminProductsRoute: typeof ApiAdminProductsRouteWithChildren
@@ -1613,6 +1638,7 @@ export interface RootRouteChildren {
   CatalogosArchivoIdRoute: typeof CatalogosArchivoIdRoute
   CatalogosVerIdRoute: typeof CatalogosVerIdRoute
   RepuestosSlugSubRoute: typeof RepuestosSlugSubRoute
+  VehiculosMarcaModeloRoute: typeof VehiculosMarcaModeloRoute
   ApiAdminCatalogosUploadRoute: typeof ApiAdminCatalogosUploadRoute
   ApiAdminEmailsUploadRoute: typeof ApiAdminEmailsUploadRoute
   ApiAdminEstudioFotoRoute: typeof ApiAdminEstudioFotoRoute
@@ -2095,6 +2121,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UploadsSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/vehiculos/': {
+      id: '/vehiculos/'
+      path: '/vehiculos'
+      fullPath: '/vehiculos/'
+      preLoaderRoute: typeof VehiculosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/automacoes/': {
       id: '/admin/automacoes/'
       path: '/automacoes'
@@ -2331,6 +2364,13 @@ declare module '@tanstack/react-router' {
       path: '/repuestos/$slug/$sub'
       fullPath: '/repuestos/$slug/$sub'
       preLoaderRoute: typeof RepuestosSlugSubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vehiculos/$marca/$modelo': {
+      id: '/vehiculos/$marca/$modelo'
+      path: '/vehiculos/$marca/$modelo'
+      fullPath: '/vehiculos/$marca/$modelo'
+      preLoaderRoute: typeof VehiculosMarcaModeloRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/admin/banners/$id': {
@@ -2735,6 +2775,7 @@ const rootRouteChildren: RootRouteChildren = {
   GuiasIndexRoute: GuiasIndexRoute,
   RepuestosAutosIndexRoute: RepuestosAutosIndexRoute,
   RepuestosIndexRoute: RepuestosIndexRoute,
+  VehiculosIndexRoute: VehiculosIndexRoute,
   ApiAdminBannersRoute: ApiAdminBannersRouteWithChildren,
   ApiAdminCategoriesRoute: ApiAdminCategoriesRouteWithChildren,
   ApiAdminProductsRoute: ApiAdminProductsRouteWithChildren,
@@ -2759,6 +2800,7 @@ const rootRouteChildren: RootRouteChildren = {
   CatalogosArchivoIdRoute: CatalogosArchivoIdRoute,
   CatalogosVerIdRoute: CatalogosVerIdRoute,
   RepuestosSlugSubRoute: RepuestosSlugSubRoute,
+  VehiculosMarcaModeloRoute: VehiculosMarcaModeloRoute,
   ApiAdminCatalogosUploadRoute: ApiAdminCatalogosUploadRoute,
   ApiAdminEmailsUploadRoute: ApiAdminEmailsUploadRoute,
   ApiAdminEstudioFotoRoute: ApiAdminEstudioFotoRoute,

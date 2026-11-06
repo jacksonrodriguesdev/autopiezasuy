@@ -20,7 +20,9 @@
     "test-loja-8081": "node scripts/diagnostico/test_loja_8081.cjs",
     "test-list-products": "node scripts/diagnostico/test_listProducts.cjs",
     "qa:botoes": "node scripts/qa/botoes_flutuantes.cjs",
-    "qa:fluidez": "node scripts/qa/fluidez.cjs"
+    "qa:fluidez": "node scripts/qa/fluidez.cjs",
+    "db:migrate": "prisma migrate deploy",
+    "db:exportar": "node --env-file=.env scripts/deploy/exportar_banco.cjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

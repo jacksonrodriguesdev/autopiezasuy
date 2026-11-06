@@ -66,11 +66,11 @@ export function descricaoRepuestos(
   if (categoria?.busca && !categoria.maquina && !marca)
     return idioma === "pt"
       ? `${total ? `${fmt(total, idioma)} peças de ` : "Peças de "}${categoria.categoria.toLowerCase()} para carros Volkswagen, Chevrolet, Fiat, Ford, Renault e mais, com código original. Envio para RS, SC e PR com nota fiscal.`
-      : `${total ? `${fmt(total)} repuestos de ` : "Repuestos de "}${categoria.nome.toLowerCase()} para autos Volkswagen, Chevrolet, Fiat, Ford, Renault y más, con código original. Cotizá por WhatsApp.`;
+      : `${total ? `${fmt(total)} ` : ""}${categoria.nome.toLowerCase()} para Volkswagen, Chevrolet, Fiat, Ford, Renault y más. Buscá por tu vehículo o por código. Envíos a todo Uruguay.`;
   if (categoria?.busca && !marca)
     return idioma === "pt"
       ? `${total ? `${fmt(total, idioma)} peças` : "Peças"} para ${categoria.categoria.toLowerCase()} Volkswagen, Chevrolet, Fiat, Volkswagen, Chevrolet, Fiat y Ford e mais. Envio para RS, SC e PR com nota fiscal.`
-      : `${total ? `${fmt(total)} repuestos` : "Repuestos"} para ${categoria.nome.toLowerCase()} Volkswagen, Chevrolet, Fiat, Volkswagen, Chevrolet, Fiat y Ford y más. Cotizá por WhatsApp.`;
+      : `${total ? `${fmt(total)} repuestos` : "Repuestos"} para ${categoria.nome.toLowerCase()}. Envíos a todo Uruguay.`;
   if (idioma === "pt") {
     const qtd = total ? `${fmt(total, idioma)} peças` : "Peças";
     if (marca && categoria)
@@ -83,12 +83,12 @@ export function descricaoRepuestos(
   }
   const qtd = total ? `${fmt(total)} repuestos` : "Repuestos";
   if (marca && categoria)
-    return `${qtd} de ${categoria.nome.toLowerCase()} para autos ${marca.marca}. Código original y cotización por WhatsApp.`;
+    return `${qtd} de ${categoria.nome.toLowerCase()} ${marca.marca} con código original. Buscá por tu vehículo. Envíos a todo Uruguay.`;
   if (marca)
-    return `${qtd} para autos ${marca.marca} (${marca.modelos.split(",").slice(0, 4).join(",")}…). Código original. Cotizá por WhatsApp.`;
+    return `${qtd} ${marca.marca}: ${marca.modelos}. Código original y aplicaciones por vehículo. Envíos a todo Uruguay.`;
   if (categoria)
-    return `${qtd} de ${categoria.nome.toLowerCase()} para Volkswagen, Chevrolet, Fiat, Ford, Renault y más. Cotizá por WhatsApp.`;
-  return "Repuestos para autos y camionetas con código original.";
+    return `${qtd} de ${categoria.nome.toLowerCase()} para Volkswagen, Chevrolet, Fiat, Ford, Renault y más. Buscá por tu vehículo. Envíos a todo Uruguay.`;
+  return "Repuestos para autos, camionetas y camiones con código original. Envíos a todo Uruguay.";
 }
 
 const alvoDe = (

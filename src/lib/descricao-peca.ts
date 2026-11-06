@@ -982,6 +982,8 @@ export type ExtraMeta = {
   precoUyu?: number | null;
   precoBrl?: number | null;
   equivalentes?: string[];
+  // "Volkswagen Gol, Fox y Voyage" (src/lib/aplicacoes-resumo.ts): deixa cada resumo único
+  veiculos?: string;
 };
 function metaDescricaoPecaCodigo(p: PecaTexto, idioma: Idioma, extra: ExtraMeta): string {
   const pt = idioma === "pt";
@@ -1011,13 +1013,22 @@ function metaDescricaoPecaCodigo(p: PecaTexto, idioma: Idioma, extra: ExtraMeta)
   const situacao = [preco, estoque].filter(Boolean).join(", ");
   const final = pt
     ? "Envio para RS, SC e PR com nota fiscal. Orçamento pelo WhatsApp."
-    : "Código original. Cotizá por WhatsApp.";
-  const partes = (comEquiv: boolean) =>
-    `${nome}${marcaTxt}, código ${codigo}${comEquiv && equiv.length ? ` (${pt ? "equivale a" : "equivale a"} ${equiv.join(", ")})` : ""}.${situacao ? ` ${situacao[0].toUpperCase()}${situacao.slice(1)}.` : ""} ${final}`;
-  const completa = partes(true);
-  if (completa.length <= 160) return completa;
-  const semEquiv = partes(false);
-  return semEquiv.length <= 160 ? semEquiv : `${semEquiv.slice(0, 157).replace(/\s+\S*$/, "")}…`;
+    : "Envío a todo Uruguay.";
+  const veic = extra.veiculos ? ` Para ${extra.veiculos}.` : "";
+  const partes = (comEquiv: boolean, comVeic: boolean) =>
+    `${nome}${marcaTxt}, código ${codigo}${comEquiv && equiv.length ? ` (equivale a ${equiv.join(", ")})` : ""}.${comVeic ? veic : ""}${situacao ? ` ${situacao[0].toUpperCase()}${situacao.slice(1)}.` : ""} ${final}`;
+  // Ordem de prioridade: veículos (únicos) > equivalentes > frase final
+  for (const [e, v] of [
+    [true, true],
+    [false, true],
+    [true, false],
+    [false, false],
+  ] as const) {
+    const s = partes(e, v);
+    if (s.length <= 160) return s;
+  }
+  const curta = partes(false, !!veic);
+  return `${curta.slice(0, 157).replace(/\s+\S*$/, "")}…`;
 }
 
 export function metaDescricaoPeca(p: PecaTexto, idioma: Idioma, extra: ExtraMeta = {}): string {

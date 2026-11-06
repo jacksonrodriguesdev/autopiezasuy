@@ -4,32 +4,14 @@
 // importado de novo.
 import { prisma } from "./prisma";
 import { emCache } from "./cache.server";
+import { modeloDe, nomeMontadora } from "./aplicacoes-resumo";
+
+export { nomeMontadora };
 
 const HORA = 3600_000;
 const ANO_ATUAL = new Date().getFullYear();
 
 export type OpcaoVeiculo = { valor: string; rotulo: string; total: number };
-
-// "MERCEDES BENZ" -> "Mercedes-Benz"; "VOLKSWAGEN" -> "Volkswagen"; siglas curtas ficam em maiúsculas
-const NOMES_ESPECIAIS: Record<string, string> = {
-  "MERCEDES BENZ": "Mercedes-Benz",
-  "MERCEDES-BENZ": "Mercedes-Benz",
-  BMW: "BMW",
-  GMC: "GMC",
-  JAC: "JAC",
-  BYD: "BYD",
-  MG: "MG",
-  DAF: "DAF",
-  "LAND ROVER": "Land Rover",
-  CITROEN: "Citroën",
-};
-export function nomeMontadora(m: string): string {
-  const k = m.trim().toUpperCase();
-  if (NOMES_ESPECIAIS[k]) return NOMES_ESPECIAIS[k];
-  return k.toLowerCase().replace(/(^|[\s-])(\p{L})/gu, (_, a, b) => a + b.toUpperCase());
-}
-
-const modeloDe = (veiculo: string) => veiculo.trim().replace(/\s+-$/, "").split(/\s+/)[0] ?? "";
 
 export function marcasVeiculo(): Promise<OpcaoVeiculo[]> {
   return emCache("veiculos|marcas", 6 * HORA, async () => {

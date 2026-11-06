@@ -65,6 +65,11 @@ export async function sitemapParte(arquivo: string): Promise<string | null> {
         url(`/repuestos/${c.slug}`, "<changefreq>weekly</changefreq><priority>0.9</priority>"),
       ),
       ...combos.map((u) => url(u, "<priority>0.7</priority>")),
+      // Páginas por veículo (/vehiculos/volkswagen/gol): só modelos com peças no catálogo
+      url(`/vehiculos`, "<changefreq>weekly</changefreq><priority>0.9</priority>"),
+      ...(await paginasVeiculo()).map((u) =>
+        url(u, "<changefreq>weekly</changefreq><priority>0.8</priority>"),
+      ),
       url(`/repuestos-autos`, "<changefreq>weekly</changefreq><priority>0.8</priority>"),
       ...LOCAIS_SEO.map((l) =>
         url(
@@ -97,6 +102,17 @@ export async function sitemapParte(arquivo: string): Promise<string | null> {
   return urlset(
     lista.map((p) => url(`/produto/${encodeURIComponent(p.sku)}`, `<lastmod>${p.data}</lastmod>`)),
   );
+}
+
+// Endereços /vehiculos/<marca>/<modelo> com pelo menos uma peça compatível
+async function paginasVeiculo(): Promise<string[]> {
+  const { VEICULOS_UY, urlVeiculo } = await import("./veiculos-seo");
+  const { skusDoVeiculo } = await import("./veiculos.server");
+  const out: string[] = [];
+  for (const v of VEICULOS_UY)
+    for (const m of v.modelos)
+      if ((await skusDoVeiculo({ montadora: v.valor, modelo: m })).size) out.push(urlVeiculo(v, m));
+  return out;
 }
 
 // Página pública de cada catálogo publicado (/catalogos/<titulo>-<id>)
