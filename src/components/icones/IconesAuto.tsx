@@ -7,7 +7,6 @@ export type IconeAuto = (props: { className?: string; strokeWidth?: number }) =>
 
 const icone =
   (desenho: ReactNode): IconeAuto =>
-  // eslint-disable-next-line react/display-name
   ({ className, strokeWidth = 1.8 }) => (
     <svg
       viewBox="0 0 24 24"
