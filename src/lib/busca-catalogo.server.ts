@@ -239,11 +239,14 @@ export async function buscarSkus(f: FiltrosBusca): Promise<string[]> {
   return ordenada.map((i) => i.sku);
 }
 
-// Vitrine variada (sliders da home): peças com foto e preço, intercalando os tipos de peça
-// (primeira palavra do nome: "Anillo", "Junta", "Bomba"...) para o slider não mostrar 16 anéis
-// seguidos. A escolha muda a cada dia.
+// Vitrine variada (sliders da home): peças com foto (com preço primeiro, quando houver),
+// intercalando os tipos de peça (primeira palavra do nome: "Anillo", "Junta", "Bomba"...) para o
+// slider não mostrar 16 anéis seguidos. A escolha muda a cada dia.
 function variado(lista: Item[]): string[] {
-  const boas = lista.filter((i) => fotoPeso(i) > 0 && i.temPreco && !/^[0-9]/.test(i.nome));
+  const comFoto = lista.filter((i) => fotoPeso(i) > 0 && !/^[0-9]/.test(i.nome));
+  const comPreco = comFoto.filter((i) => i.temPreco);
+  // Sem preços cadastrados (ex.: preços retirados para trocar), mostra as peças com foto
+  const boas = comPreco.length >= 16 ? comPreco : comFoto;
   const dia = Math.floor(Date.now() / 86_400_000);
   const grupos = new Map<string, Item[]>();
   for (const i of boas) {
