@@ -1,0 +1,185 @@
+# Rede de segurança: a cada envio para o main, o GitHub compila o site, cria um banco MySQL de
+# teste, roda os testes e abre as páginas principais. Só se tudo passar, o código vai para o ramo
+# "producao", que é o ramo que a Hostinger publica (docs/DEPLOY_HOSTINGER.md).
+# Se falhar: o site no ar continua na última versão boa e o GitHub manda um e-mail com o erro.
+name: Verificar
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: verificar-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verificar:
+    name: Compila e testa o site
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: ci
+          MYSQL_DATABASE: agro_ci
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -pci"
+          --health-interval=5s --health-timeout=5s --health-retries=30
+    env:
+      # Banco de teste descartável (o script de dados recusa bancos sem "ci"/"teste" no nome)
+      DATABASE_URL: mysql://root:ci@127.0.0.1:3306/agro_ci
+      JWT_SECRET: ci-segredo-de-teste-com-mais-de-trinta-e-dois-caracteres
+      VITE_SITE_URL: https://agropartsuy.com
+      UPLOADS_DIR: ${{ github.workspace }}/.ci-uploads
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Tipos (TypeScript)
+        run: npx tsc --noEmit
+
+      - name: Lint e formatação (ESLint + Prettier)
+        run: npm run lint
+
+      - name: Banco de teste
+        run: |
+          npx prisma db push --skip-generate
+          node scripts/ci/semente.cjs
+
+      - name: Resumo diário e eventos
+        run: npx tsx scripts/ci/testar-resumo.ts
+
+      - name: Contagem diária de visitas (fuso do Uruguai, sem robôs)
+        run: npx tsx scripts/ci/testar-visitas.ts
+
+      - name: Limpeza das estatísticas (robôs de fora, contas internas, recorrentes, Valmet = Valtra)
+        run: npx tsx scripts/ci/testar-limpeza-estatisticas.ts
+
+      - name: SEO fase 1 (títulos das peças, descrição com preço, cache, leads do Google)
+        run: npx tsx scripts/ci/testar-seo-leads.ts
+
+      - name: Endereços em português na versão /pt (/pt/pecas, /pt/pecas-agricolas)
+        run: npx tsx scripts/ci/testar-caminhos-pt.ts
+
+      - name: Cidades do RS, SC e PR com dados do IBGE (páginas e listas dos estados)
+        run: npx tsx scripts/ci/testar-municipios-sul.ts
+
+      - name: Google Shopping no painel (Merchant Center falso)
+        run: npx tsx scripts/ci/testar-merchant.ts
+
+      - name: Campanhas (Black Friday) e cupons
+        run: npx tsx scripts/ci/testar-campanha.ts
+
+      - name: E-mail marketing por blocos (Resend falso)
+        run: npx tsx scripts/ci/testar-emails.ts
+
+      - name: E-mail marketing (anúncios, cliques, funil e remarketing)
+        run: npx tsx scripts/ci/testar-email-marketing.ts
+
+      - name: Instagram (API da Meta falsa)
+        run: npx tsx scripts/ci/testar-instagram.ts
+
+      - name: Facebook (página e anúncios, API da Meta falsa)
+        run: npx tsx scripts/ci/testar-facebook.ts
+
+      - name: Meta Ads (campanhas, leads, criar anúncio; API falsa)
+        run: npx tsx scripts/ci/testar-meta-ads.ts
+
+      - name: Estúdio de publicações (recomendações, fotos, legendas)
+        run: npx tsx scripts/ci/testar-estudio.ts
+
+      - name: Vendas, etiquetas e avaliações (cupom de 15%)
+        run: npx tsx scripts/ci/testar-avaliacoes.ts
+
+      - name: Anúncios prontos do dia (Meta Ads)
+        run: npx tsx scripts/ci/testar-anuncios-prontos.ts
+
+      - name: Links de pagamento (dLocal falsa)
+        run: npx tsx scripts/ci/testar-pagamentos.ts
+
+      - name: Links de pagamento (Stripe falso)
+        run: npx tsx scripts/ci/testar-stripe.ts
+
+      - name: Financeiro (vendas, custos e lucro)
+        run: npx tsx scripts/ci/testar-financeiro.ts
+
+      - name: Fiscal do MEI e nota fiscal automática (Focus NFe falsa)
+        run: npx tsx scripts/ci/testar-fiscal.ts
+
+      - name: Extrato do banco (leitura, classificação e imposto de renda)
+        run: npx tsx scripts/ci/testar-extratos.ts
+
+      - name: Acompanhamento do pedido e indicação
+        run: npx tsx scripts/ci/testar-pedidos.ts
+
+      - name: Peças na nova venda (preço e cadastro rápido)
+        run: npx tsx scripts/ci/testar-pecas-venda.ts
+
+      - name: Ficha do cliente (viu e não pediu)
+        run: npx tsx scripts/ci/testar-ficha-cliente.ts
+
+      - name: Fotos na avaliação
+        run: npx tsx scripts/ci/testar-fotos-avaliacao.ts
+
+      - name: E-mail de peças vistas sem orçamento
+        run: npx tsx scripts/ci/testar-interesse-email.ts
+
+      - name: Contato pelo WhatsApp (pop-up)
+        run: npx tsx scripts/ci/testar-contato-whatsapp.ts
+
+      - name: Captação (avisos de preço e visitantes quentes)
+        run: npx tsx scripts/ci/testar-captura.ts
+
+      - name: Envio de imagens (JFIF, AVIF, HEIC…)
+        run: npx tsx scripts/ci/testar-upload-imagem.ts
+
+      - name: Login com Face ID (passkeys)
+        run: npx tsx scripts/ci/testar-passkey.ts
+
+      - name: Search Console (Google falso)
+        run: npx tsx scripts/ci/testar-search-console.ts
+
+      - name: Central de Anúncios (Meta e Google Ads falsos)
+        run: npx tsx scripts/ci/testar-ads.ts
+
+      - name: Build (o mesmo da Hostinger)
+        run: npm run build
+
+      - name: Páginas principais (teste de fumaça)
+        run: |
+          mkdir -p "$UPLOADS_DIR"
+          PORT=3999 NODE_ENV=production node .output/server/index.mjs > servidor.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf http://localhost:3999/robots.txt > /dev/null && break; sleep 1; done
+          BASE_URL=http://localhost:3999 node scripts/ci/fumaca.cjs
+
+      - name: Segurança do login e do painel (sessão do admin, CSRF, limite de senha)
+        run: BASE_URL=http://localhost:3999 node scripts/ci/testar-seguranca.cjs
+
+      - name: Log do servidor (quando falha)
+        if: failure()
+        run: cat servidor.log || true
+
+  publicar:
+    name: Liberar para a Hostinger (ramo producao)
+    needs: verificar
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Atualizar o ramo producao
+        run: git push --force origin HEAD:refs/heads/producao
