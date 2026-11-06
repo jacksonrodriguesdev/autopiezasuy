@@ -153,7 +153,20 @@ function iniciarAutomacoes() {
   // Buscador por veículo e índice da loja: calcula já no primeiro acesso (cada um leva alguns
   // segundos com 100 mil peças e 2 milhões de aplicações), para o cliente não esperar
   import("./lib/veiculos.server")
-    .then((m) => m.marcasVeiculo())
+    .then(async (m) => {
+      await m.marcasVeiculo();
+      // Peças das montadoras dos sliders da home (src/components/home/SlidersHome.tsx)
+      for (const montadora of [
+        "VOLKSWAGEN",
+        "CHEVROLET",
+        "FIAT",
+        "FORD",
+        "RENAULT",
+        "PEUGEOT",
+        "TOYOTA",
+      ])
+        await m.skusDoVeiculo({ montadora });
+    })
     .catch((e) => console.error("veículos", e));
   import("./lib/busca-catalogo.server")
     .then((m) => m.buscarSkus({ vitrine: true }))

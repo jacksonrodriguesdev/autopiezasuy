@@ -89,3 +89,17 @@ export const MONTADORAS = MARCAS_PECAS;
 export const INSTAGRAM_URL = "";
 export const INSTAGRAM_USUARIO = "";
 export const FACEBOOK_URL = "";
+
+// Sigla da marca no círculo (sem usar logotipos de terceiros): "VW", "CH", "MB"...
+const SIGLAS: Record<string, string> = { VOLKSWAGEN: "VW", "MERCEDES BENZ": "MB", CITROEN: "CI" };
+export const siglaMarca = (m: { valor: string; nome: string }) =>
+  SIGLAS[m.valor] ??
+  (/[\s-]/.test(m.nome)
+    ? m.nome
+        .split(/[\s-]/)
+        .map((p) => p[0])
+        .join("")
+    : m.nome.slice(0, 2)
+  )
+    .slice(0, 2)
+    .toUpperCase();

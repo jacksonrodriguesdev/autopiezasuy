@@ -3,7 +3,6 @@
 // (admin → Homepage) siguen apareciendo debajo de estas secciones.
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
 import {
   Car,
   Hash,
@@ -16,10 +15,9 @@ import {
   Camera,
 } from "lucide-react";
 import { BuscaVeiculo } from "@/components/BuscaVeiculo";
-import { ProductRail } from "@/components/home/ProductRail";
+import { SlidersHome } from "@/components/home/SlidersHome";
 import { useCategoriasLoja } from "@/hooks/use-categorias-loja";
-import { listProducts, type Product } from "@/lib/products";
-import { MARCAS_VEICULO, MARCAS_PECAS } from "@/lib/navegacao";
+import { MARCAS_VEICULO, MARCAS_PECAS, siglaMarca } from "@/lib/navegacao";
 import { whatsappContactUrl, PHONE_DISPLAY } from "@/lib/whatsapp";
 import { abrirFotoPieza } from "@/components/FotoPieza";
 import { cn } from "@/lib/utils";
@@ -216,64 +214,12 @@ function MarcasVeiculo() {
               className="group flex flex-col items-center gap-2 rounded-xl border border-zinc-200/80 bg-zinc-50/60 px-2 py-3.5 transition hover:border-accent/40 hover:bg-white hover:shadow-md"
             >
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-[15px] font-extrabold tracking-tight text-white shadow-inner transition group-hover:bg-accent">
-                {m.nome
-                  .split(/[\s-]/)
-                  .map((p) => p[0])
-                  .join("")
-                  .slice(0, 2)}
+                {siglaMarca(m)}
               </span>
               <span className="text-[13px] font-semibold text-zinc-700">{m.nome}</span>
             </Link>
           ))}
         </div>
-      </div>
-    </section>
-  );
-}
-
-const ABAS_DESTAQUE = ["Frenos", "Suspensión", "Motor", "Eléctrica", "Embrague"];
-
-function Destacados() {
-  const [aba, setAba] = useState(ABAS_DESTAQUE[0]);
-  const { data, isLoading } = useQuery({
-    queryKey: ["home-destacados", aba],
-    queryFn: () =>
-      listProducts({
-        linha: "AUTOMOTIVA",
-        categoria: [aba],
-        hasImage: true,
-        vitrine: true,
-        sort: "nome-asc",
-        pageSize: 18,
-      }),
-    staleTime: 5 * 60 * 1000,
-  });
-  return (
-    <section className="mx-auto max-w-7xl px-4 py-10 md:py-14">
-      <Titulo
-        titulo="Destacados"
-        sub="Repuestos con foto, código y marca"
-        link={{ to: "/loja", texto: `Ver ${aba.toLowerCase()}`, search: { categoria: aba } }}
-      />
-      <div className="scrollbar-none -mx-4 mb-4 flex gap-2 overflow-x-auto px-4">
-        {ABAS_DESTAQUE.map((a) => (
-          <button
-            key={a}
-            type="button"
-            onClick={() => setAba(a)}
-            className={cn(
-              "shrink-0 rounded-full px-4 py-2 text-sm font-bold transition",
-              a === aba
-                ? "bg-primary text-white shadow"
-                : "bg-white text-zinc-600 ring-1 ring-zinc-200 hover:text-primary",
-            )}
-          >
-            {a}
-          </button>
-        ))}
-      </div>
-      <div className="rounded-2xl bg-white p-3 shadow-sm ring-1 ring-zinc-200/70 md:p-4">
-        <ProductRail products={(data?.rows ?? []) as Product[]} loading={isLoading} />
       </div>
     </section>
   );
@@ -365,7 +311,7 @@ export function HomeAutos({ children }: { children?: React.ReactNode }) {
       <Hero />
       <Categorias />
       <MarcasVeiculo />
-      <Destacados />
+      <SlidersHome />
       <MarcasPecas />
       <Beneficios />
       {children}

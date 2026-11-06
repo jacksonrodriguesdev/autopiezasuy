@@ -225,6 +225,7 @@ export async function buscarSkus(f: FiltrosBusca): Promise<string[]> {
   else if (f.sort === "created-desc")
     ordenada.sort((a, b) => b.criado - a.criado || (a.sku < b.sku ? -1 : 1));
   else if (f.sort === "sku") ordenada.sort((a, b) => (a.sku < b.sku ? -1 : 1));
+  else if (f.sort === "variado") return variado(ordenada);
   // Ordem padrão: com foto primeiro, depois com preço; nomes que começam com letra antes dos
   // que começam com número ("2008 - 2015 C/ Tunel" é descrição de tapete, não um bom destaque)
   else
@@ -236,6 +237,30 @@ export async function buscarSkus(f: FiltrosBusca): Promise<string[]> {
         compararNome(a, b),
     );
   return ordenada.map((i) => i.sku);
+}
+
+// Vitrine variada (sliders da home): peças com foto e preço, intercalando os tipos de peça
+// (primeira palavra do nome: "Anillo", "Junta", "Bomba"...) para o slider não mostrar 16 anéis
+// seguidos. A escolha muda a cada dia.
+function variado(lista: Item[]): string[] {
+  const boas = lista.filter((i) => fotoPeso(i) > 0 && i.temPreco && !/^[0-9]/.test(i.nome));
+  const dia = Math.floor(Date.now() / 86_400_000);
+  const grupos = new Map<string, Item[]>();
+  for (const i of boas) {
+    const tipo = i.nome.split(/\s+/)[0].toLowerCase();
+    grupos.set(tipo, [...(grupos.get(tipo) ?? []), i]);
+  }
+  const filas = [...grupos.values()].sort((a, b) => b.length - a.length);
+  // Gira a ordem dos tipos e o começo de cada fila conforme o dia
+  const ini = filas.length ? dia % filas.length : 0;
+  const ordem = [...filas.slice(ini), ...filas.slice(0, ini)].map((g) => {
+    const k = dia % g.length;
+    return [...g.slice(k), ...g.slice(0, k)];
+  });
+  const saida: string[] = [];
+  for (let rodada = 0; saida.length < boas.length && rodada < 10_000; rodada++)
+    for (const g of ordem) if (g[rodada]) saida.push(g[rodada].sku);
+  return saida;
 }
 
 // Pedido rápido: acha cada código digitado pelo cliente (SKU, código do fabricante ou de uma

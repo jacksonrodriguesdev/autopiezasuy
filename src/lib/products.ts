@@ -68,7 +68,7 @@ export type ListParams = {
   veiculo?: { montadora: string; modelo?: string | null; ano?: number | null };
   precoMin?: number;
   precoMax?: number;
-  sort?: "nome-asc" | "nome-desc" | "preco-asc" | "preco-desc" | "sku" | "created-desc";
+  sort?: "nome-asc" | "nome-desc" | "preco-asc" | "preco-desc" | "sku" | "created-desc" | "variado";
   page?: number;
   pageSize?: number;
   cursor?: string;
