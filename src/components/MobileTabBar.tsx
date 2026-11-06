@@ -1,19 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Camera,
-  Home,
-  LayoutGrid,
-  MessageCircle,
-  ShoppingCart,
-  User,
-  Car,
-  LogOut,
-} from "lucide-react";
+import { Camera, Home, LayoutGrid, MessageCircle, User, Car, LogOut } from "lucide-react";
 import { abrirFotoPieza } from "@/components/FotoPieza";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { useCart } from "@/components/CartContext";
+import { BuscaVeiculo, lerMeuVeiculo, rotuloVeiculo } from "@/components/BuscaVeiculo";
 import { getSessionFn } from "@/lib/user-auth";
 import { whatsappContactUrl } from "@/lib/whatsapp";
 import { MARCAS_VEICULO } from "@/lib/navegacao";
@@ -22,24 +13,36 @@ import { cn } from "@/lib/utils";
 import { useT } from "@/lib/idioma";
 import { SeletorIdioma } from "@/components/SeletorIdioma";
 
-// Barra de navegação inferior no celular, como em aplicativo.
+// Barra de navegação inferior no celular: "dock" azul flutuante com o vehículo do cliente no
+// centro (o carrinho fica no header).
 // Não aparece no admin nem em telas a partir de md (desktop usa o header).
 export function MobileTabBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const [sheet, setSheet] = useState<"categorias" | "conta" | null>(null);
-  const { items, setIsCartOpen } = useCart();
+  const [sheet, setSheet] = useState<"categorias" | "conta" | "auto" | null>(null);
   const { data: user } = useQuery({ queryKey: ["auth_session"], queryFn: () => getSessionFn() });
-  const cartItemCount = items.reduce((sum, i) => sum + i.quantity, 0);
+  // Vehículo guardado no navegador (BuscaVeiculo): aparece no botão do centro
+  const [meuAuto, setMeuAuto] = useState("");
+  useEffect(() => {
+    const v = lerMeuVeiculo();
+    if (v) setMeuAuto(rotuloVeiculo(v));
+  }, [sheet]);
   const categorias = useCategoriasLoja();
   const { t, href } = useT();
 
   if (pathname.startsWith("/admin") || pathname.startsWith("/catalogos/ver/")) return null;
-  // Páginas com barra fixa própria logo acima desta (ex.: comprar na página do produto)
-  const barraPropria = pathname.startsWith("/produto/");
 
-  const tab =
-    "flex flex-1 flex-col items-center justify-center gap-0.5 py-1.5 text-[11px] font-medium text-zinc-500 transition-colors active:scale-95";
-  const ativo = "text-primary";
+  const zap = whatsappContactUrl(
+    t("¡Hola! Quiero cotizar repuestos.", "Olá! Quero fazer um orçamento de peças."),
+  );
+  const item = (ativo: boolean) =>
+    cn(
+      "relative flex flex-1 flex-col items-center justify-center gap-1 text-[10.5px] font-semibold tracking-wide transition active:scale-90",
+      ativo ? "text-amber-400" : "text-white/60",
+    );
+  // Pontinho embaixo do item ativo
+  const ponto = (ativo: boolean) =>
+    ativo && <span className="absolute bottom-1.5 h-1 w-1 rounded-full bg-amber-400" />;
+  const contaAtiva = sheet === "conta" || pathname === "/login" || pathname === "/cuenta";
 
   return (
     <>
@@ -47,78 +50,90 @@ export function MobileTabBar() {
       <div className="h-[calc(var(--barra-inferior)+1rem)] md:hidden" aria-hidden />
       <nav
         aria-label={t("Navegación principal", "Navegação principal")}
-        className="fixed inset-x-0 bottom-0 z-50 border-t border-zinc-200 bg-white pb-safe md:hidden"
+        className="fixed inset-x-0 bottom-0 z-50 px-3 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] md:hidden"
       >
-        <div className="flex h-16 items-stretch">
-          <Link to="/" className={cn(tab, pathname === "/" && ativo)}>
-            <Home className="h-6 w-6" />
+        <div className="relative mx-auto flex h-16 max-w-md items-stretch rounded-[22px] bg-[#0b1d3a]/95 shadow-[0_12px_32px_-8px_rgba(11,29,58,0.55)] ring-1 ring-white/10 backdrop-blur">
+          <Link to="/" className={item(pathname === "/")}>
+            <Home className="h-[22px] w-[22px]" />
             {t("Inicio", "Início")}
+            {ponto(pathname === "/")}
           </Link>
           <button
+            type="button"
             onClick={() => setSheet("categorias")}
-            className={cn(tab, (sheet === "categorias" || pathname.startsWith("/loja")) && ativo)}
+            className={item(sheet === "categorias" || pathname.startsWith("/loja"))}
           >
-            <LayoutGrid className="h-6 w-6" />
-            {t("Categorías", "Categorias")}
+            <LayoutGrid className="h-[22px] w-[22px]" />
+            {t("Explorar", "Explorar")}
+            {ponto(sheet === "categorias" || pathname.startsWith("/loja"))}
           </button>
 
-          {/* Ação principal: cotação pelo WhatsApp. Na página do produto há uma barra própria
-              de compra logo acima; lá o botão fica plano para não cobrir "Consultar precio". */}
-          {barraPropria ? (
-            <a
-              href={whatsappContactUrl(
-                t("¡Hola! Quiero cotizar repuestos.", "Olá! Quero fazer um orçamento de peças."),
-              )}
-              target="_blank"
-              rel="noreferrer noopener"
-              className={cn(tab, "text-[#128C4B]")}
-            >
-              <MessageCircle className="h-6 w-6" />
-              {t("Cotizar", "Orçamento")}
-            </a>
-          ) : (
-            <a
-              href={whatsappContactUrl(
-                t("¡Hola! Quiero cotizar repuestos.", "Olá! Quero fazer um orçamento de peças."),
-              )}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="flex flex-1 flex-col items-center justify-start text-[11px] font-semibold text-[#128C4B] active:scale-95"
-            >
-              <span className="-mt-5 mb-0.5 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-[#25D366]/40 ring-4 ring-white">
-                <MessageCircle className="h-7 w-7" />
-              </span>
-              {t("Cotizar", "Orçamento")}
-            </a>
-          )}
-
-          <button onClick={() => setIsCartOpen(true)} className={tab}>
-            <span className="relative">
-              <ShoppingCart className="h-6 w-6" />
-              {cartItemCount > 0 && (
-                <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-zinc-900">
-                  {cartItemCount}
-                </span>
-              )}
+          {/* Centro: o vehículo do cliente (busca as peças que servem) */}
+          <button
+            type="button"
+            onClick={() => setSheet("auto")}
+            className="flex flex-1 flex-col items-center justify-start text-[10.5px] font-bold text-white active:scale-95"
+          >
+            <span className="-mt-5 mb-1 flex h-[52px] w-[52px] items-center justify-center rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 text-white shadow-lg shadow-orange-600/40 ring-4 ring-slate-100">
+              <Car className="h-6 w-6" />
             </span>
-            {t("Carrito", "Carrinho")}
+            <span className="max-w-[72px] truncate">
+              {meuAuto ? meuAuto.split(" ").slice(0, 2).join(" ") : t("Mi auto", "Meu carro")}
+            </span>
           </button>
+
+          <a href={zap} target="_blank" rel="noreferrer noopener" className={item(false)}>
+            <MessageCircle className="h-[22px] w-[22px] text-emerald-400" />
+            {t("Cotizar", "Orçamento")}
+          </a>
           {user ? (
-            <button
-              onClick={() => setSheet("conta")}
-              className={cn(tab, sheet === "conta" && ativo)}
-            >
-              <User className="h-6 w-6" />
+            <button type="button" onClick={() => setSheet("conta")} className={item(contaAtiva)}>
+              <span className="flex h-[22px] w-[22px] items-center justify-center rounded-full bg-white/15 text-[11px] font-black text-white">
+                {(user.nome.trim()[0] ?? "U").toUpperCase()}
+              </span>
               {t("Cuenta", "Conta")}
+              {ponto(contaAtiva)}
             </button>
           ) : (
-            <Link to="/login" className={cn(tab, pathname === "/login" && ativo)}>
-              <User className="h-6 w-6" />
+            <Link to="/login" className={item(contaAtiva)}>
+              <User className="h-[22px] w-[22px]" />
               {t("Ingresar", "Entrar")}
+              {ponto(contaAtiva)}
             </Link>
           )}
         </div>
       </nav>
+
+      <Sheet open={sheet === "auto"} onOpenChange={(o) => setSheet(o ? "auto" : null)}>
+        <SheetContent side="bottom" className="rounded-t-3xl pb-safe">
+          <div className="mx-auto mb-2 h-1.5 w-12 rounded-full bg-zinc-200" />
+          <SheetHeader>
+            <SheetTitle>{t("¿Qué auto tenés?", "Qual é o seu carro?")}</SheetTitle>
+            <p className="text-sm text-muted-foreground">
+              {t(
+                "Te mostramos solo los repuestos que le sirven.",
+                "Mostramos só as peças que servem nele.",
+              )}
+            </p>
+          </SheetHeader>
+          <div className="px-4 pb-5">
+            <BuscaVeiculo
+              variante="compacta"
+              aoBuscar={(v) => {
+                setMeuAuto(rotuloVeiculo(v));
+                setSheet(null);
+              }}
+            />
+            <Link
+              to="/vehiculos"
+              onClick={() => setSheet(null)}
+              className="mt-3 block text-center text-sm font-semibold text-primary"
+            >
+              {t("Ver todas las marcas y modelos", "Ver todas as marcas e modelos")}
+            </Link>
+          </div>
+        </SheetContent>
+      </Sheet>
 
       <Sheet open={sheet === "categorias"} onOpenChange={(o) => setSheet(o ? "categorias" : null)}>
         <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-3xl pb-safe">

@@ -214,11 +214,11 @@
   }
 }
 
-/* Altura real da barra inferior do celular (MobileTabBar: 4rem + área segura do iPhone).
+/* Altura real da barra inferior do celular (MobileTabBar: 4rem + 0,5rem de margem + área segura do iPhone).
    Todo elemento flutuante no rodapé usa esta variável para ficar ACIMA dela.
    No desktop a barra não existe (0). */
 :root {
-  --barra-inferior: calc(4rem + env(safe-area-inset-bottom));
+  --barra-inferior: calc(4.5rem + env(safe-area-inset-bottom));
 }
 @media (min-width: 768px) {
   :root {
