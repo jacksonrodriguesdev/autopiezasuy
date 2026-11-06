@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
-import { Mail, Lock, Loader2, MessageCircle } from "lucide-react";
+import { Mail, Lock, Loader2, MessageCircle, ArrowRight } from "lucide-react";
 import {
   AuthShell,
   Campo,
@@ -85,10 +85,12 @@ function LoginPage() {
 
   return (
     <AuthShell
-      titulo={t("Ingresá a tu cuenta", "Entre na sua conta")}
+      aba="login"
+      redirect={destino}
+      titulo={t("¡Hola de nuevo!", "Olá de novo!")}
       subtitulo={t(
-        "Cotizá más rápido y accedé a los catálogos.",
-        "Peça orçamento mais rápido e acesse os catálogos.",
+        "Ingresá para cotizar más rápido y ver tus pedidos.",
+        "Entre para pedir orçamento mais rápido e ver seus pedidos.",
       )}
     >
       {/* Face ID / digital: some nos navegadores sem suporte */}
@@ -155,20 +157,24 @@ function LoginPage() {
         <button
           type="submit"
           disabled={busy || !email || !senha}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary text-base font-bold text-white shadow-lg shadow-primary/25 transition hover:bg-primary/90 active:scale-[0.99] disabled:opacity-50"
+          className="group flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-orange-500 py-3.5 text-base font-black text-white shadow-lg shadow-orange-500/30 transition hover:bg-orange-600 active:scale-[0.99] disabled:opacity-50 disabled:shadow-none"
         >
-          {busy && <Loader2 className="h-5 w-5 animate-spin" />}{" "}
+          {busy ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <ArrowRight className="h-5 w-5 transition group-hover:translate-x-0.5" />
+          )}
           {busy ? t("Ingresando…", "Entrando…") : t("Ingresar", "Entrar")}
         </button>
       </form>
-      <p className="mt-6 text-center text-[15px] text-zinc-600">
-        {t("¿No tenés cuenta?", "Não tem conta?")}{" "}
+      <p className="mt-6 text-center text-sm text-slate-500">
+        {t("¿Primera vez?", "Primeira vez?")}{" "}
         <Link
           to="/cadastro"
           search={{ redirect: destino } as never}
-          className="font-bold text-primary hover:underline"
+          className="font-bold text-[#0b1d3a] underline decoration-orange-400 decoration-2 underline-offset-4 hover:text-orange-600"
         >
-          {t("Creá tu cuenta gratis", "Crie sua conta grátis")}
+          {t("Creá tu cuenta en 30 segundos", "Crie sua conta em 30 segundos")}
         </Link>
       </p>
     </AuthShell>

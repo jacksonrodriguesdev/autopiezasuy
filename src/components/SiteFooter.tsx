@@ -1,5 +1,16 @@
 import { Link } from "@tanstack/react-router";
-import { Mail, Phone, MapPin, Instagram, Facebook, Lock, Truck, MessageCircle } from "lucide-react";
+import {
+  Mail,
+  Instagram,
+  Facebook,
+  Lock,
+  Truck,
+  MessageCircle,
+  ChevronDown,
+  Car,
+  ArrowRight,
+  ShieldCheck,
+} from "lucide-react";
 import { whatsappContactUrl, PHONE_DISPLAY } from "@/lib/whatsapp";
 import { INSTAGRAM_URL, INSTAGRAM_USUARIO, FACEBOOK_URL } from "@/lib/navegacao";
 import { BandeiraUruguay } from "@/components/Bandeiras";
@@ -13,161 +24,227 @@ import { CartaoApp } from "@/components/AppInstalavel";
 
 const AYUDA = [
   { label: ["Cómo comprar", "Como comprar"], hash: "como-comprar" },
-  { label: ["Envíos a Uruguay", "Envio para o Sul do Brasil"], hash: "envios" },
+  { label: ["Envíos a Uruguay", "Envios"], hash: "envios" },
   { label: ["Formas de pago", "Formas de pagamento"], hash: "pagos" },
   { label: ["Garantía y devoluciones", "Garantia e trocas"], hash: "garantia" },
   { label: ["Preguntas frecuentes", "Perguntas frequentes"], hash: "preguntas" },
 ] as const;
 
+const tituloCls = "mb-4 text-xs font-black uppercase tracking-[0.18em] text-amber-400";
+const linkCls = "text-slate-300 transition-colors hover:text-white";
+
+// Grupo de links para o Google (marcas, veículos, categorias, departamentos). Fica dentro de um
+// <details>: o HTML sempre traz os links (o Google lê), e a pessoa abre só o que quer ver.
+function GrupoLinks({
+  titulo,
+  todos,
+  children,
+}: {
+  titulo: string;
+  todos?: { href: string; texto: string };
+  children: React.ReactNode;
+}) {
+  return (
+    <details className="group border-b border-white/10 py-1 [&_summary::-webkit-details-marker]:hidden">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-3 text-sm font-bold text-white">
+        {titulo}
+        <ChevronDown className="h-4 w-4 text-slate-400 transition group-open:rotate-180" />
+      </summary>
+      <div className="flex flex-wrap gap-2 pb-4">
+        {children}
+        {todos && (
+          <a
+            href={todos.href}
+            className="inline-flex items-center gap-1 rounded-full bg-amber-400 px-3 py-1.5 text-xs font-bold text-[#0b1d3a] hover:bg-amber-300"
+          >
+            {todos.texto} <ArrowRight className="h-3 w-3" />
+          </a>
+        )}
+      </div>
+    </details>
+  );
+}
+
+const chipCls =
+  "rounded-full bg-white/5 px-3 py-1.5 text-xs text-slate-300 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white";
+
 export function SiteFooter() {
   const { t, idioma, href } = useT();
+  const zap = whatsappContactUrl(
+    t("¡Hola! Quiero consultar por repuestos.", "Olá! Quero consultar sobre peças."),
+  );
   return (
-    <footer className="mt-auto border-t-4 border-accent bg-[#0a1428] py-12 text-slate-400">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 md:grid-cols-2 lg:grid-cols-4">
-        {/* Marca */}
+    <footer className="mt-auto bg-[#0b1d3a] text-sm">
+      {/* Chamada do WhatsApp */}
+      <div className="bg-gradient-to-r from-orange-500 to-amber-500">
+        <div className="mx-auto flex max-w-7xl flex-col items-start gap-4 px-4 py-7 sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-white">
+            <p className="text-xl font-black leading-tight sm:text-2xl">
+              {t("¿No encontrás tu repuesto?", "Não achou sua peça?")}
+            </p>
+            <p className="mt-1 text-white/90">
+              {t(
+                "Mandanos el código, la foto o tu vehículo y te respondemos con precio.",
+                "Mande o código, a foto ou seu veículo e respondemos com o preço.",
+              )}
+            </p>
+          </div>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+            <a
+              data-livre="1"
+              href={zap}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#0b1d3a] px-5 py-3 font-bold text-white shadow-lg transition hover:bg-[#13294f]"
+            >
+              <MessageCircle className="h-5 w-5 text-emerald-400" />
+              WhatsApp {PHONE_DISPLAY}
+            </a>
+            <Link
+              to="/cotizar"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 font-bold text-[#0b1d3a] transition hover:bg-orange-50"
+            >
+              {t("Pedir cotización", "Pedir orçamento")} <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Colunas */}
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.1fr]">
         <div>
-          <Link to="/" className="mb-4 flex items-center gap-3">
-            <span className="rounded-[14px] ring-1 ring-white/10">
-              <img
-                decoding="async"
-                src="/logo.svg"
-                alt=""
-                width={44}
-                height={44}
-                className="h-11 w-11"
-                loading="lazy"
-              />
-            </span>
-            <span className="leading-tight">
-              <span className="block text-lg font-extrabold text-white">AUTO PIEZAS UY</span>
-              <span className="block text-xs font-semibold tracking-wider text-accent">
+          <Link to="/" className="flex items-center gap-3">
+            <img
+              decoding="async"
+              loading="lazy"
+              src="/logo.svg"
+              alt=""
+              width={48}
+              height={48}
+              className="h-12 w-12"
+            />
+            <span className="leading-none">
+              <span className="block text-xl font-black tracking-tight text-white">
+                AUTO PIEZAS UY
+              </span>
+              <span className="mt-1 block text-[11px] font-bold tracking-[0.22em] text-amber-400">
                 {t("REPUESTOS PARA AUTOS", "AUTOPEÇAS")}
               </span>
             </span>
           </Link>
-          <p className="text-sm leading-relaxed">
+          <p className="mt-4 max-w-sm leading-relaxed text-slate-400">
             {t(
               "Más de 100.000 repuestos para autos, camionetas y camiones. Buscá por tu vehículo o por código y recibilo en todo Uruguay.",
-              "Mais de 49.000 peças para carros e caminhonetes Volkswagen, Chevrolet, Fiat, Ford, Renault e Peugeot. Enviamos para todo o RS, SC e PR por Correios ou transportadora.",
+              "Mais de 100.000 peças para carros, caminhonetes e caminhões, com envio para todo o Uruguai.",
             )}
           </p>
+          <Link
+            to="/vehiculos"
+            className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-white/5 px-4 py-3 font-bold text-white ring-1 ring-white/10 transition hover:bg-white/10"
+          >
+            <Car className="h-5 w-5 text-amber-400" />
+            {t("Buscar por mi vehículo", "Buscar pelo meu veículo")}
+            <ArrowRight className="h-4 w-4 text-slate-400" />
+          </Link>
           <CartaoApp />
         </div>
 
-        {/* Atención */}
         <div>
-          <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-white">
-            {t("Atención", "Atendimento")}
-          </h3>
-          <ul className="space-y-3 text-sm">
+          <h3 className={tituloCls}>{t("Tienda", "Loja")}</h3>
+          <ul className="space-y-2.5">
+            <li>
+              <Link to="/loja" className={linkCls}>
+                {t("Todos los repuestos", "Todas as peças")}
+              </Link>
+            </li>
+            <li>
+              <a href="/vehiculos" className={linkCls}>
+                {t("Repuestos por vehículo", "Peças por veículo")}
+              </a>
+            </li>
+            <li>
+              <a href={href("/repuestos")} className={linkCls}>
+                {t("Marcas de repuestos", "Marcas de peças")}
+              </a>
+            </li>
+            <li>
+              <Link to="/pedido-rapido" className={linkCls}>
+                {t("Pedido rápido por códigos", "Pedido rápido por códigos")}
+              </Link>
+            </li>
+            <li>
+              <Link to="/catalogos" className={linkCls}>
+                {t("Catálogos para mecánicos", "Catálogos para mecânicos")}
+              </Link>
+            </li>
+            <li>
+              <a href={href("/guias")} className={linkCls}>
+                {t("Guías y consejos", "Guias e dicas")}
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className={tituloCls}>{t("Ayuda", "Ajuda")}</h3>
+          <ul className="space-y-2.5">
+            {AYUDA.map((a) => (
+              <li key={a.hash}>
+                <Link to="/ayuda" hash={a.hash} className={linkCls}>
+                  {t(a.label[0], a.label[1])}
+                </Link>
+              </li>
+            ))}
+            <li>
+              <Link to="/cuenta" className={linkCls}>
+                {t("Mi cuenta", "Minha conta")}
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className={tituloCls}>{t("Contacto", "Contato")}</h3>
+          <ul className="space-y-3">
             <li>
               <a
                 data-livre="1"
-                href={whatsappContactUrl(
-                  t("¡Hola! Quiero consultar por repuestos.", "Olá! Quero consultar sobre peças."),
-                )}
+                href={zap}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-2 transition-colors hover:text-white"
+                className="flex items-center gap-3 rounded-2xl bg-emerald-500/10 p-3 ring-1 ring-emerald-400/20 transition hover:bg-emerald-500/20"
               >
-                <Phone className="h-4 w-4 text-primary" /> WhatsApp {PHONE_DISPLAY}
+                <MessageCircle className="h-5 w-5 shrink-0 text-emerald-400" />
+                <span className="leading-tight">
+                  <span className="block text-xs text-slate-400">WhatsApp</span>
+                  <span className="font-bold text-white">{PHONE_DISPLAY}</span>
+                </span>
               </a>
             </li>
             <li>
               <a
                 href="mailto:contacto@autopiezasuy.com"
-                className="flex items-center gap-2 break-all transition-colors hover:text-white"
+                className="flex items-center gap-2 break-all text-slate-300 hover:text-white"
               >
-                <Mail className="h-4 w-4 shrink-0 text-primary" /> contacto@autopiezasuy.com
+                <Mail className="h-4 w-4 shrink-0 text-amber-400" /> contacto@autopiezasuy.com
               </a>
             </li>
-            <li className="flex items-start gap-2">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-              <span>
-                {t("Tienda online · Envíos a todo Uruguay", "Loja online")}
-                <br />
-                {t(
-                  "Te asesoramos por WhatsApp con precio y disponibilidad.",
-                  "Atendemos pelo WhatsApp e enviamos para todo o RS, SC e PR por Correios ou transportadora.",
-                )}
-              </span>
-            </li>
-          </ul>
-        </div>
-
-        {/* Ayuda */}
-        <div>
-          <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-white">
-            {t("Ayuda", "Ajuda")}
-          </h3>
-          <ul className="space-y-2 text-sm">
-            <li>
-              <Link
-                to="/cotizar"
-                className="font-semibold text-orange-300 transition-colors hover:text-orange-200"
-              >
-                {t("Cotizá con nosotros", "Peça seu orçamento")}
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/pedido-rapido"
-                className="font-semibold text-white/90 transition-colors hover:text-white"
-              >
-                {t("Pedido rápido por códigos", "Pedido rápido por códigos")}
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/catalogos"
-                className="font-semibold text-white/90 transition-colors hover:text-white"
-              >
-                {t("Catálogos para mecánicos", "Catálogos para mecânicos")}
-              </Link>
-            </li>
-            {AYUDA.map((a) => (
-              <li key={a.hash}>
-                <Link to="/ayuda" hash={a.hash} className="transition-colors hover:text-white">
-                  {t(a.label[0], a.label[1])}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Garantías */}
-        <div>
-          <h3 className="mb-4 text-sm font-bold uppercase tracking-wider text-white">
-            {t("Comprá tranquilo", "Compre com tranquilidade")}
-          </h3>
-          <ul className="space-y-3 text-sm">
-            <li className="flex items-center gap-2">
-              <Truck className="h-4 w-4 text-primary" />{" "}
-              {t("Pago seguro", "Envio com código de rastreio")}
-            </li>
-            <li className="flex items-center gap-2">
-              <MessageCircle className="h-4 w-4 text-primary" />{" "}
-              {t("Atención personalizada por WhatsApp", "Atendimento personalizado pelo WhatsApp")}
-            </li>
-            <li className="flex items-center gap-2">
-              <Lock className="h-4 w-4 text-primary" />{" "}
-              {t("Sitio seguro (HTTPS)", "Site seguro (HTTPS)")}
-            </li>
-            <li className="flex items-center gap-2">
-              <BandeiraUruguay className="h-3.5 w-5 rounded-[2px]" /> Envíos a todo Uruguay
+            <li className="flex items-center gap-2 text-slate-300">
+              <BandeiraUruguay className="h-3.5 w-5 shrink-0 rounded-[2px]" />
+              {t("Envíos a todo Uruguay", "Envio para todo o Uruguai")}
             </li>
           </ul>
           {(INSTAGRAM_URL || FACEBOOK_URL) && (
-            <div className="mt-5 flex gap-3">
+            <div className="mt-5 flex gap-2">
               {INSTAGRAM_URL && (
                 <a
                   href={INSTAGRAM_URL}
                   target="_blank"
                   rel="noreferrer"
                   aria-label={`Instagram ${INSTAGRAM_USUARIO}`}
-                  className="inline-flex items-center gap-2 rounded-full bg-zinc-800 py-2 pl-2 pr-4 text-sm font-semibold text-white/90 transition-colors hover:bg-gradient-to-r hover:from-[#f58529] hover:via-[#dd2a7b] hover:to-[#8134af] hover:text-white"
+                  className="rounded-xl bg-white/5 p-2.5 text-white ring-1 ring-white/10 hover:bg-white/10"
                 >
-                  <Instagram className="h-5 w-5" /> {INSTAGRAM_USUARIO}
+                  <Instagram className="h-5 w-5" />
                 </a>
               )}
               {FACEBOOK_URL && (
@@ -176,7 +253,7 @@ export function SiteFooter() {
                   target="_blank"
                   rel="noreferrer"
                   aria-label="Facebook"
-                  className="rounded-full bg-zinc-800 p-2 transition-colors hover:bg-primary hover:text-white"
+                  className="rounded-xl bg-white/5 p-2.5 text-white ring-1 ring-white/10 hover:bg-white/10"
                 >
                   <Facebook className="h-5 w-5" />
                 </a>
@@ -186,91 +263,83 @@ export function SiteFooter() {
         </div>
       </div>
 
-      {/* Links para as páginas por marca e categoria (ajudam o Google a encontrá-las) */}
-      <div className="mx-auto mt-10 max-w-7xl space-y-3 border-t border-zinc-800 px-4 pt-6 text-sm">
-        {/* Guias técnicos e páginas por máquina */}
-        <p className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          <a
-            href={href("/guias")}
-            className="font-bold uppercase tracking-wider text-white hover:text-primary"
+      {/* Links para o Google: marcas, veículos, categorias, departamentos e guias */}
+      <div className="mx-auto max-w-7xl px-4">
+        <div className="border-t border-white/10">
+          <GrupoLinks
+            titulo={t("Repuestos por vehículo", "Peças por veículo")}
+            todos={{ href: "/vehiculos", texto: t("Ver todos", "Ver todos") }}
           >
-            {t("Guías:", "Guias:")}
-          </a>
-          {GUIAS.map((g) => (
-            <a key={g.slug} href={href(`/guias/${g.slug}`)} className="hover:text-white">
-              {g.titulo[idioma]}
-            </a>
-          ))}
-        </p>
-        <p className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          <a
-            href={href("/repuestos")}
-            className="font-bold uppercase tracking-wider text-white hover:text-primary"
+            {VEICULOS_UY.slice(0, 10).flatMap((v) =>
+              v.modelos.slice(0, 2).map((m) => (
+                <a key={v.valor + m} href={urlVeiculo(v, m)} className={chipCls}>
+                  {v.nome} {nomeModeloSeo(m)}
+                </a>
+              )),
+            )}
+          </GrupoLinks>
+          <GrupoLinks
+            titulo={t("Repuestos por marca", "Peças por marca")}
+            todos={{ href: href("/repuestos"), texto: t("Ver todas", "Ver todas") }}
           >
-            {t("Repuestos por marca:", "Peças por marca:")}
-          </a>
-          {MARCAS_SEO.map((m) => (
-            <a key={m.slug} href={href(`/repuestos/${m.slug}`)} className="hover:text-white">
-              {t("Repuestos", "Peças")} {m.marca}
-            </a>
-          ))}
-        </p>
-        <p className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          <a
-            href="/vehiculos"
-            className="font-bold uppercase tracking-wider text-white hover:text-primary"
-          >
-            Por vehículo:
-          </a>
-          {VEICULOS_UY.slice(0, 8).flatMap((v) =>
-            v.modelos.slice(0, 2).map((m) => (
-              <a key={v.valor + m} href={urlVeiculo(v, m)} className="hover:text-white">
-                Repuestos {v.nome} {nomeModeloSeo(m)}
-              </a>
-            )),
-          )}
-        </p>
-        <p className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          <span className="font-bold uppercase tracking-wider text-white">
-            {t("Por categoría:", "Por categoria:")}
-          </span>
-          {CATEGORIAS_SEO.map((c) => (
-            <a key={c.slug} href={href(`/repuestos/${c.slug}`)} className="hover:text-white">
-              {idioma === "pt" ? c.categoria : c.nome}
-            </a>
-          ))}
-        </p>
-        <p className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          <a
-            href={href("/repuestos-autos")}
-            className="font-bold uppercase tracking-wider text-white hover:text-primary"
-          >
-            {t("Envíos a:", "Envios para:")}
-          </a>
-          {/* Departamentos do Uruguai */}
-          {locaisDoIdioma(idioma)
-            .filter((l) => l.tipo === "departamento")
-            .map((l) => (
-              <a
-                key={l.slug}
-                href={href(`/repuestos-autos/${l.slug}`)}
-                className="hover:text-white"
-              >
-                {nomeLocal(l, idioma)}
+            {MARCAS_SEO.map((m) => (
+              <a key={m.slug} href={href(`/repuestos/${m.slug}`)} className={chipCls}>
+                {m.marca}
               </a>
             ))}
-        </p>
+          </GrupoLinks>
+          <GrupoLinks titulo={t("Repuestos por categoría", "Peças por categoria")}>
+            {CATEGORIAS_SEO.map((c) => (
+              <a key={c.slug} href={href(`/repuestos/${c.slug}`)} className={chipCls}>
+                {idioma === "pt" ? c.categoria : c.nome}
+              </a>
+            ))}
+          </GrupoLinks>
+          <GrupoLinks
+            titulo={t("Envíos por departamento", "Envios por departamento")}
+            todos={{ href: href("/repuestos-autos"), texto: t("Ver todos", "Ver todos") }}
+          >
+            {locaisDoIdioma(idioma)
+              .filter((l) => l.tipo === "departamento")
+              .map((l) => (
+                <a key={l.slug} href={href(`/repuestos-autos/${l.slug}`)} className={chipCls}>
+                  {nomeLocal(l, idioma)}
+                </a>
+              ))}
+          </GrupoLinks>
+          <GrupoLinks
+            titulo={t("Guías técnicas", "Guias técnicos")}
+            todos={{ href: href("/guias"), texto: t("Ver todas", "Ver todas") }}
+          >
+            {GUIAS.map((g) => (
+              <a key={g.slug} href={href(`/guias/${g.slug}`)} className={chipCls}>
+                {g.titulo[idioma]}
+              </a>
+            ))}
+          </GrupoLinks>
+        </div>
       </div>
 
-      <div className="mt-8 border-t border-zinc-800 px-4 pt-6 text-center text-xs text-zinc-500">
-        <SeletorIdioma variante="escura" className="mb-3 justify-center" />
+      {/* Rodapé final */}
+      <div className="mx-auto flex max-w-7xl flex-col items-center gap-4 px-4 py-8 text-xs text-slate-500 md:flex-row md:justify-between">
         <p>
           &copy; {new Date().getFullYear()} AUTO PIEZAS UY ·{" "}
-          {t(
-            "Tienda online de repuestos para autos · Uruguay",
-            "Loja online de peças para autos · Chuí / Chuy",
-          )}
+          {t("Repuestos para autos en Uruguay", "Peças para carros no Uruguai")}
         </p>
+        <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+          <li className="flex items-center gap-1.5">
+            <Lock className="h-3.5 w-3.5 text-emerald-400" /> {t("Sitio seguro", "Site seguro")}
+          </li>
+          <li className="flex items-center gap-1.5">
+            <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />{" "}
+            {t("Pago protegido", "Pagamento protegido")}
+          </li>
+          <li className="flex items-center gap-1.5">
+            <Truck className="h-3.5 w-3.5 text-emerald-400" />{" "}
+            {t("Envíos a todo el país", "Envio para todo o país")}
+          </li>
+        </ul>
+        <SeletorIdioma variante="escura" />
       </div>
     </footer>
   );

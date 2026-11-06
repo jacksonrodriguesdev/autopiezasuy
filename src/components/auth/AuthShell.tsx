@@ -1,141 +1,186 @@
 import { useState, type ReactNode, type InputHTMLAttributes } from "react";
 import { Link } from "@tanstack/react-router";
-import {
-  ArrowLeft,
-  Eye,
-  EyeOff,
-  Check,
-  MessageCircle,
-  BookOpen,
-  Truck,
-  ShieldCheck,
-} from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Check, MessageCircle, Search, PackageCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useT } from "@/lib/idioma";
+import { whatsappContactUrl, PHONE_DISPLAY } from "@/lib/whatsapp";
+import { avaliarSenha, mascararCelularUY } from "@/lib/validacao-conta";
 
 // "o" / "ou" entre o botão do Google e o formulário
 function SeparadorTexto() {
   const { t } = useT();
   return <>{t("o", "ou")}</>;
 }
-import { avaliarSenha, mascararCelularUY } from "@/lib/validacao-conta";
 
-// Moldura das telas de conta (login e cadastro). No celular: topo verde compacto e o
-// formulário ocupando a tela. No computador: painel da marca à esquerda e formulário à direita.
+// Moldura das telas de conta (login e cadastro): faixa azul com a "estrada" no topo, um cartão
+// único centralizado com abas Ingresar / Crear cuenta e, no computador, um painel laranja ao lado
+// com o que a conta oferece. No celular o cartão ocupa a largura toda.
 export function AuthShell({
   titulo,
   subtitulo,
+  aba,
+  redirect,
   children,
 }: {
   titulo: string;
   subtitulo: string;
+  aba?: "login" | "cadastro";
+  redirect?: string;
   children: ReactNode;
 }) {
   const { t } = useT();
+  const busca = redirect ? ({ redirect } as never) : undefined;
   return (
-    <div className="min-h-[100dvh] bg-[#f3f5f1] lg:grid lg:grid-cols-[1.05fr_1fr]">
-      {/* Painel da marca (computador) */}
-      <aside className="relative hidden overflow-hidden bg-[#0f2850] text-white lg:flex lg:flex-col lg:justify-between lg:p-12">
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-[0.08] [background-image:repeating-linear-gradient(-28deg,#fff_0_2px,transparent_2px_42px)]"
-        />
-        <div
-          aria-hidden
-          className="absolute -right-32 -top-32 h-[520px] w-[520px] rounded-full bg-emerald-500/20 blur-3xl"
-        />
-        <Link to="/" className="relative flex items-center gap-3">
-          <span className="rounded-2xl bg-white p-1.5">
-            <img src="/logo-96.webp" alt="" width={52} height={52} className="h-[52px] w-[52px]" />
-          </span>
-          <span>
-            <span className="block text-2xl font-extrabold">AUTO PIEZAS UY</span>
-            <span className="block text-xs font-bold tracking-[0.25em] text-orange-300">
-              {t("REPUESTOS PARA AUTOS", "AUTOPEÇAS")}
-            </span>
-          </span>
-        </Link>
-        <div className="relative max-w-md">
-          <h2 className="text-4xl font-extrabold leading-tight">
-            {t("Tu cuenta para cotizar más rápido", "Sua conta para pedir orçamento mais rápido")}
-          </h2>
-          <ul className="mt-8 space-y-5">
-            {[
-              [
-                MessageCircle,
-                t(
-                  "Cotizaciones por WhatsApp con tus datos ya cargados",
-                  "Orçamentos pelo WhatsApp com seus dados já preenchidos",
-                ),
-              ],
-              [
-                BookOpen,
-                t(
-                  "Catálogos y manuales en PDF para mecánicos",
-                  "Catálogos e manuais em PDF para mecânicos",
-                ),
-              ],
-              [
-                Truck,
-                t("Tu dirección guardada para tus pedidos", "Seu endereço salvo para os envios"),
-              ],
-              [
-                ShieldCheck,
-                t(
-                  "Tus datos protegidos. Nunca compartimos tu información",
-                  "Seus dados protegidos. Nunca compartilhamos suas informações",
-                ),
-              ],
-            ].map(([Icone, texto]: any) => (
-              <li key={texto} className="flex items-start gap-4">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/15">
-                  <Icone className="h-5 w-5 text-orange-300" />
-                </span>
-                <span className="pt-2 text-[17px] text-white/90">{texto}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <p className="relative text-sm text-white/50">
-          © {new Date().getFullYear()} AUTO PIEZAS UY ·{" "}
-          {t("Atención por WhatsApp", "Envio para todo o Sul do Brasil")}
-        </p>
-      </aside>
+    <div className="relative min-h-[100dvh] overflow-hidden bg-slate-100">
+      {/* Faixa do topo: asfalto azul com a linha da estrada */}
+      <div aria-hidden className="absolute inset-x-0 top-0 h-[300px] bg-[#0b1d3a] sm:h-[340px]">
+        <div className="absolute inset-0 opacity-[0.07] [background-image:radial-gradient(#fff_1px,transparent_1px)] [background-size:18px_18px]" />
+        <div className="absolute inset-x-0 bottom-16 h-[6px] [background-image:repeating-linear-gradient(90deg,#f59e0b_0_48px,transparent_48px_96px)] opacity-80" />
+        <div className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-orange-500/25 blur-3xl" />
+        <div className="absolute -right-20 top-10 h-64 w-64 rounded-full bg-sky-400/15 blur-3xl" />
+      </div>
 
-      {/* Formulário */}
-      <main className="flex min-h-[100dvh] flex-col">
-        <div className="bg-[#0f2850] px-4 pb-14 pt-safe text-white lg:hidden">
-          <div className="flex items-center justify-between py-3">
-            <Link to="/" className="flex items-center gap-1.5 text-sm font-semibold text-white/85">
-              <ArrowLeft className="h-4 w-4" /> {t("Tienda", "Loja")}
-            </Link>
-            <img
-              src="/logo-96.webp"
-              alt="AUTO PIEZAS UY"
-              width={40}
-              height={40}
-              className="h-10 w-10 rounded-xl bg-white p-1"
-            />
-          </div>
-          <h1 className="mt-3 text-[28px] font-extrabold leading-tight">{titulo}</h1>
-          <p className="mt-1 text-white/75">{subtitulo}</p>
+      <div className="relative mx-auto flex min-h-[100dvh] max-w-[1040px] flex-col px-4 pb-24 pt-safe sm:px-6">
+        {/* Barra superior */}
+        <div className="flex items-center justify-between py-5 text-white">
+          <Link to="/" className="flex items-center gap-3">
+            <img src="/logo.svg" alt="" width={44} height={44} className="h-11 w-11" />
+            <span className="leading-none">
+              <span className="block text-lg font-black tracking-tight">AUTO PIEZAS UY</span>
+              <span className="mt-1 block text-[11px] font-bold tracking-[0.22em] text-amber-400">
+                {t("REPUESTOS PARA AUTOS", "AUTOPEÇAS")}
+              </span>
+            </span>
+          </Link>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-2 text-sm font-semibold text-white ring-1 ring-white/15 transition hover:bg-white/20"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span className="hidden sm:inline">{t("Volver a la tienda", "Voltar à loja")}</span>
+            <span className="sm:hidden">{t("Tienda", "Loja")}</span>
+          </Link>
         </div>
-        <div className="-mt-8 flex flex-1 justify-center px-4 pb-28 lg:mt-0 lg:items-center lg:px-10 lg:py-12">
-          <div className="w-full max-w-[440px] rounded-3xl bg-white p-6 shadow-[0_20px_60px_-20px_rgba(6,50,27,0.25)] ring-1 ring-black/5 sm:p-8">
-            <div className="mb-6 hidden lg:block">
-              <Link
-                to="/"
-                className="mb-6 inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-500 hover:text-primary"
-              >
-                <ArrowLeft className="h-4 w-4" /> {t("Volver a la tienda", "Voltar à loja")}
-              </Link>
-              <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900">{titulo}</h1>
-              <p className="mt-1.5 text-zinc-500">{subtitulo}</p>
-            </div>
+
+        {/* Cartão */}
+        <div className="mt-4 grid overflow-hidden rounded-[28px] bg-white shadow-[0_30px_80px_-30px_rgba(11,29,58,0.45)] ring-1 ring-black/5 sm:mt-8 lg:grid-cols-[1fr_380px]">
+          <main className="p-6 sm:p-10">
+            {aba && (
+              <div className="mb-7 grid grid-cols-2 rounded-2xl bg-slate-100 p-1.5 text-[15px] font-bold">
+                <Link
+                  to="/login"
+                  search={busca}
+                  className={cn(
+                    "rounded-xl py-2.5 text-center transition",
+                    aba === "login"
+                      ? "bg-white text-[#0b1d3a] shadow-sm"
+                      : "text-slate-500 hover:text-slate-800",
+                  )}
+                >
+                  {t("Ingresar", "Entrar")}
+                </Link>
+                <Link
+                  to="/cadastro"
+                  search={busca}
+                  className={cn(
+                    "rounded-xl py-2.5 text-center transition",
+                    aba === "cadastro"
+                      ? "bg-white text-[#0b1d3a] shadow-sm"
+                      : "text-slate-500 hover:text-slate-800",
+                  )}
+                >
+                  {t("Crear cuenta", "Criar conta")}
+                </Link>
+              </div>
+            )}
+            <h1 className="text-[28px] font-black leading-tight tracking-tight text-[#0b1d3a] sm:text-[32px]">
+              {titulo}
+            </h1>
+            <p className="mb-7 mt-1.5 text-slate-500">{subtitulo}</p>
             {children}
-          </div>
+          </main>
+
+          {/* Painel lateral */}
+          <aside className="relative hidden overflow-hidden bg-gradient-to-br from-orange-500 via-orange-500 to-amber-500 p-9 text-white lg:flex lg:flex-col">
+            <svg
+              aria-hidden
+              viewBox="0 0 200 200"
+              className="absolute -bottom-16 -right-16 h-72 w-72 text-white/15"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="10"
+            >
+              <circle cx="100" cy="100" r="80" />
+              <circle cx="100" cy="100" r="28" />
+              {[0, 60, 120, 180, 240, 300].map((g) => (
+                <line
+                  key={g}
+                  x1="100"
+                  y1="72"
+                  x2="100"
+                  y2="24"
+                  transform={`rotate(${g} 100 100)`}
+                />
+              ))}
+            </svg>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-white/80">
+              {t("Tu cuenta", "Sua conta")}
+            </p>
+            <p className="mt-2 text-[26px] font-black leading-tight">
+              {t("Tu garaje online", "Sua garagem online")}
+            </p>
+            <ul className="relative mt-7 space-y-4">
+              {[
+                [
+                  Search,
+                  t("Guardá tu vehículo", "Salve seu veículo"),
+                  t("y encontrá repuestos que le sirven", "e ache peças que servem"),
+                ],
+                [
+                  MessageCircle,
+                  t("Cotizá en 1 clic", "Orçamento em 1 clique"),
+                  t("por WhatsApp, con tus datos", "pelo WhatsApp, com seus dados"),
+                ],
+                [
+                  PackageCheck,
+                  t("Seguí tus pedidos", "Acompanhe seus pedidos"),
+                  t("y tu historial de compras", "e seu histórico"),
+                ],
+              ].map(([Icone, forte, resto]: any) => (
+                <li key={forte} className="flex items-start gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/20">
+                    <Icone className="h-5 w-5" />
+                  </span>
+                  <span className="pt-0.5 text-[15px] leading-snug">
+                    <b className="block">{forte}</b>
+                    <span className="text-white/85">{resto}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <div className="relative mt-auto rounded-2xl bg-[#0b1d3a]/90 p-4">
+              <p className="text-3xl font-black">+100.000</p>
+              <p className="text-sm text-white/75">
+                {t("repuestos con envío a todo Uruguay", "peças com envio para todo o Uruguai")}
+              </p>
+            </div>
+          </aside>
         </div>
-      </main>
+
+        {/* Ajuda */}
+        <a
+          href={whatsappContactUrl(
+            t("¡Hola! Necesito ayuda con mi cuenta.", "Olá! Preciso de ajuda com minha conta."),
+          )}
+          target="_blank"
+          rel="noreferrer noopener"
+          className="mx-auto mt-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-[#0b1d3a]"
+        >
+          <MessageCircle className="h-4 w-4 text-emerald-600" />
+          {t("¿Problemas para ingresar? WhatsApp", "Problemas para entrar? WhatsApp")}{" "}
+          {PHONE_DISPLAY}
+        </a>
+      </div>
     </div>
   );
 }

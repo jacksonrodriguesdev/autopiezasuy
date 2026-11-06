@@ -124,6 +124,8 @@ function CadastroPage() {
 
   return (
     <AuthShell
+      aba="cadastro"
+      redirect={destino}
       titulo={t("Creá tu cuenta", "Crie sua conta")}
       subtitulo={t(
         "Gratis. Cotizá más rápido y accedé a los catálogos.",

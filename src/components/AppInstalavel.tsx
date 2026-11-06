@@ -433,14 +433,14 @@ export function CartaoApp() {
   if (comoApp && !podeAvisos) return null;
 
   return (
-    <div className="mt-5 rounded-xl border border-zinc-700 bg-zinc-800/60 p-4">
+    <div className="mt-5 max-w-sm rounded-2xl bg-white/5 p-4 ring-1 ring-white/10">
       <p className="flex items-center gap-2 text-sm font-bold text-white">
         <Smartphone className="h-4 w-4 text-accent" />
         {comoApp
           ? t("Recibí avisos de ofertas", "Receba avisos de ofertas")
           : t("Tené AUTO PIEZAS UY en tu celular", "Tenha a AUTO PIEZAS UY no celular")}
       </p>
-      <p className="mt-1 text-xs leading-relaxed">
+      <p className="mt-1 text-xs leading-relaxed text-slate-400">
         {t(
           "Abrí la tienda con un toque y enterate cuando baja el precio de un repuesto.",
           "Abra a loja com um toque e saiba quando o preço de uma peça baixar.",
@@ -452,7 +452,7 @@ export function CartaoApp() {
           <Link
             to="/app"
             onClick={() => registrarEvento("app", "clique_pagina:rodape")}
-            className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-bold text-white hover:bg-primary/90"
+            className="flex items-center gap-1.5 rounded-lg bg-amber-400 px-3 py-2 text-xs font-bold text-[#0b1d3a] hover:bg-amber-300"
           >
             <Download className="h-3.5 w-3.5" /> {t("Descargar el app", "Baixar o app")}
           </Link>
