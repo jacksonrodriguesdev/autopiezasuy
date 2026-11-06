@@ -125,9 +125,9 @@ export const TIPOS: DefTipo[] = [
       titulo: "¡Hola {{nombre}}, qué bueno tenerte en AUTO PIEZAS UY!",
       texto:
         "Ya tenés acceso a **todos nuestros catálogos técnicos** y a miles de repuestos para autos.\n\nBuscá por código o por modelo y pedí tu cotización por WhatsApp.",
-      // O código é trocado pelo cupom único de cada cliente (AGRO-XXXX) na hora do envio
+      // O código é trocado pelo cupom único de cada cliente (AUTO-XXXX) na hora do envio
       cupom: {
-        codigo: "AGRO-XXXX",
+        codigo: "AUTO-XXXX",
         texto: "15% de descuento en tu primera compra",
         validade: "para tu primera compra",
       },
@@ -153,7 +153,7 @@ export const TIPOS: DefTipo[] = [
       texto:
         "Usá tu cupón en tu próxima compra de repuestos. Pedí tu cotización por WhatsApp y mencioná el código.",
       cupom: {
-        codigo: "AGRO10",
+        codigo: "AUTO10",
         texto: "10% de descuento en tu próxima compra",
         validade: "hasta fin de mes",
       },

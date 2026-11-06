@@ -48,11 +48,13 @@ export function BuscaVeiculo({
   variante = "hero",
   className,
   aoBuscar,
+  rotuloBotao = "Buscar repuestos",
 }: {
   inicial?: MeuVeiculo | null;
   variante?: "hero" | "compacta";
   className?: string;
   aoBuscar?: (v: MeuVeiculo) => void;
+  rotuloBotao?: string;
 }) {
   const navigate = useNavigate();
   const [auto, setAuto] = useState(inicial?.auto ?? "");
@@ -201,7 +203,7 @@ export function BuscaVeiculo({
         ) : (
           <Car className="h-5 w-5" />
         )}
-        Buscar repuestos
+        {rotuloBotao}
       </button>
     </form>
   );

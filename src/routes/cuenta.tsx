@@ -33,6 +33,7 @@ import { STATUS_LINK, fmtValor } from "@/lib/pagamentos-comum";
 import { IndicarAmigo } from "@/components/IndicarAmigo";
 import { MeusPedidos } from "@/components/MeusPedidos";
 import { PasskeysConta } from "@/components/auth/Passkey";
+import { CompletarCadastro } from "@/components/conta/CompletarCadastro";
 
 export const Route = createFileRoute("/cuenta")({
   validateSearch: z.object({
@@ -87,15 +88,26 @@ function CuentaPage() {
     window.location.href = href("/");
   };
 
+  // Primeiro login: tela de boas-vindas em 2 passos (src/components/conta/CompletarCadastro.tsx)
+  if (completar) return <CompletarCadastro perfil={perfil} destino={destino} />;
+
   return (
-    <div className="min-h-screen bg-[#f3f5f1]">
+    <div className="min-h-screen bg-slate-100">
       <SiteHeader />
       <main className="mx-auto max-w-5xl px-3 py-5 md:px-4 md:py-10">
         {/* Cabeçalho do perfil */}
-        <section className="relative overflow-hidden rounded-3xl bg-[#0f2850] p-5 text-white md:p-8">
+        <section className="relative overflow-hidden rounded-[28px] bg-[#0b1d3a] p-5 text-white shadow-[0_30px_60px_-30px_rgba(11,29,58,0.6)] md:p-8">
           <div
             aria-hidden
-            className="absolute inset-0 opacity-[0.08] [background-image:repeating-linear-gradient(-28deg,#fff_0_2px,transparent_2px_42px)]"
+            className="absolute inset-0 opacity-[0.07] [background-image:radial-gradient(#fff_1px,transparent_1px)] [background-size:18px_18px]"
+          />
+          <div
+            aria-hidden
+            className="absolute -right-16 -top-20 h-64 w-64 rounded-full bg-orange-500/25 blur-3xl"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-x-0 bottom-0 h-[5px] [background-image:repeating-linear-gradient(90deg,#f59e0b_0_40px,transparent_40px_80px)] opacity-70"
           />
           <div className="relative flex items-center gap-4">
             {perfil.avatar_url ? (
@@ -106,13 +118,13 @@ function CuentaPage() {
                 className="h-16 w-16 rounded-2xl object-cover ring-2 ring-white/30 md:h-20 md:w-20"
               />
             ) : (
-              <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-accent text-2xl font-extrabold text-[#0f2850] md:h-20 md:w-20 md:text-3xl">
+              <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-400 text-2xl font-black text-[#0b1d3a] md:h-20 md:w-20 md:text-3xl">
                 {iniciais}
               </span>
             )}
             <div className="min-w-0 flex-1">
               <p className="text-sm text-white/70">{t("Hola,", "Olá,")}</p>
-              <h1 className="truncate text-2xl font-extrabold md:text-3xl">
+              <h1 className="truncate text-2xl font-black md:text-3xl">
                 {perfil.nome_completo.trim().split(" ")[0] || t("Mi cuenta", "Minha conta")}
               </h1>
               <p className="truncate text-sm text-white/70">{perfil.email}</p>
@@ -145,12 +157,12 @@ function CuentaPage() {
             ].map((a) => {
               const conteudo = (
                 <>
-                  <a.icone className="h-5 w-5 text-orange-300" />
+                  <a.icone className="h-5 w-5 text-amber-400" />
                   <span className="text-[13px] font-semibold">{a.rotulo}</span>
                 </>
               );
               const cls =
-                "flex flex-col items-center gap-1.5 rounded-2xl bg-white/10 py-3 ring-1 ring-white/10 transition hover:bg-white/20 active:scale-95";
+                "flex flex-col items-center gap-1.5 rounded-2xl bg-white/[0.07] py-3 ring-1 ring-white/10 transition hover:bg-white/15 active:scale-95";
               return a.to ? (
                 <Link key={a.rotulo} to={a.to} className={cls}>
                   {conteudo}
@@ -223,10 +235,10 @@ function CuentaPage() {
                 key={a.id}
                 onClick={() => setAba(a.id)}
                 className={cn(
-                  "flex shrink-0 items-center gap-2.5 rounded-xl px-4 py-3 text-sm font-semibold transition",
+                  "flex shrink-0 items-center gap-2.5 rounded-2xl px-4 py-3 text-sm font-bold transition",
                   aba === a.id
-                    ? "bg-white text-primary shadow-sm ring-1 ring-black/5"
-                    : "text-zinc-600 hover:bg-white/60",
+                    ? "bg-[#0b1d3a] text-white shadow-md"
+                    : "bg-white text-slate-600 ring-1 ring-black/5 hover:text-[#0b1d3a] md:bg-transparent md:ring-0 md:hover:bg-white",
                 )}
               >
                 <a.icone className="h-4 w-4" /> {t(a.rotulo[0], a.rotulo[1])}
@@ -239,7 +251,7 @@ function CuentaPage() {
               <LogOut className="h-4 w-4" /> {t("Cerrar sesión", "Sair da conta")}
             </button>
           </nav>
-          <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5 md:p-8">
+          <div className="rounded-[28px] bg-white p-5 shadow-sm ring-1 ring-black/5 md:p-8">
             {aba === "datos" && <Dados perfil={perfil} destino={completar ? destino : undefined} />}
             {aba === "compras" && (
               <>
@@ -459,7 +471,7 @@ function Dados({ perfil, destino }: { perfil: Perfil; destino?: string }) {
       <button
         type="submit"
         disabled={busy}
-        className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary px-8 font-bold text-white shadow-lg shadow-primary/25 hover:bg-primary/90 disabled:opacity-60 sm:w-auto"
+        className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-orange-500 px-8 font-black text-white shadow-lg shadow-orange-500/30 hover:bg-orange-600 disabled:opacity-60 sm:w-auto"
       >
         {busy && <Loader2 className="h-5 w-5 animate-spin" />}{" "}
         {t("Guardar cambios", "Salvar alterações")}

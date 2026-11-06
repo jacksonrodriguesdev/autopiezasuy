@@ -790,7 +790,7 @@ export async function enviarAutomacao(a: Automacao, envios: Envio[]) {
   // Anúncio por e-mail (rodízio por cliente), se a automação não desligou
   const mk = await import("./email-marketing.server");
   const anuncios = base.semAnuncio ? [] : await mk.anunciosAtivos("AUTOMACAO");
-  // Boas-vindas com cupom: cada cliente recebe o próprio cupom único (AGRO-XXXX)
+  // Boas-vindas com cupom: cada cliente recebe o próprio cupom único (AUTO-XXXX)
   if (a.tipo === "boas_vindas" && base.cupom) {
     const { garantirCupom } = await import("./acesso.server");
     for (const e of envios) if (!e.user.cupom) e.user.cupom = await garantirCupom(e.user.id);

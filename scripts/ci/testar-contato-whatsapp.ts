@@ -1,5 +1,5 @@
 // Teste do contato pelo WhatsApp do pop-up (sem conta): celular do Uruguai e do Brasil, celular
-// inválido, cupom no formato AGRO-XXXX, o mesmo celular de novo não duplica (soma o interesse e
+// inválido, cupom no formato AUTO-XXXX, o mesmo celular de novo não duplica (soma o interesse e
 // mantém o cupom), origem e cidade vindas da visita, e o painel do admin (lista, etapa, cupom usado).
 // Roda com: npx tsx scripts/ci/testar-contato-whatsapp.ts (só em banco de teste)
 import assert from "node:assert/strict";
@@ -45,7 +45,7 @@ import assert from "node:assert/strict";
     if ("erro" in a) return;
     tels.push(a.telefone);
     assert.equal(a.novo, true);
-    assert.match(a.cupom ?? "", /^AGRO-[2-9A-HJ-NP-Z]{4}$/);
+    assert.match(a.cupom ?? "", /^AUTO-[2-9A-HJ-NP-Z]{4}$/);
 
     const b = await c.registrarContato({
       telefone: "+598 99 555 111",

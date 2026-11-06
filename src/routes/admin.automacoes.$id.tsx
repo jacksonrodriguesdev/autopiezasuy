@@ -307,7 +307,7 @@ function Formulario({ inicial, atualizar }: { inicial: Automacao; atualizar: () 
             titulo="Cupom"
             dica={
               inicial.tipo === "boas_vindas"
-                ? "Nas boas-vindas, o código é trocado pelo cupom único de cada cliente (AGRO-XXXX), o mesmo do pop-up. Você confere em Site → Pop-up de cadastro."
+                ? "Nas boas-vindas, o código é trocado pelo cupom único de cada cliente (AUTO-XXXX), o mesmo do pop-up. Você confere em Site → Pop-up de cadastro."
                 : "Caixa em destaque com o código. O cliente menciona o código no WhatsApp ao pedir."
             }
           >
@@ -320,7 +320,7 @@ function Formulario({ inicial, atualizar }: { inicial: Automacao; atualizar: () 
                     "cupom",
                     v
                       ? {
-                          codigo: "AGRO10",
+                          codigo: "AUTO10",
                           texto: "10% de descuento en tu próxima compra",
                           validade: "hasta fin de mes",
                         }

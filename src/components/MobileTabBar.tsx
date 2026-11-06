@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Camera, Home, LayoutGrid, MessageCircle, User, Car, LogOut } from "lucide-react";
 import { abrirFotoPieza } from "@/components/FotoPieza";
@@ -18,6 +18,7 @@ import { SeletorIdioma } from "@/components/SeletorIdioma";
 // Não aparece no admin nem em telas a partir de md (desktop usa o header).
 export function MobileTabBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
   const [sheet, setSheet] = useState<"categorias" | "conta" | "auto" | null>(null);
   const { data: user } = useQuery({ queryKey: ["auth_session"], queryFn: () => getSessionFn() });
   // Vehículo guardado no navegador (BuscaVeiculo): aparece no botão do centro
@@ -122,6 +123,7 @@ export function MobileTabBar() {
               aoBuscar={(v) => {
                 setMeuAuto(rotuloVeiculo(v));
                 setSheet(null);
+                navigate({ to: "/loja", search: v as never });
               }}
             />
             <Link

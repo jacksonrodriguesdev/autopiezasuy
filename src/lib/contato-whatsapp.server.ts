@@ -49,12 +49,12 @@ export function normalizarCelular(entrada: string, idioma: "es" | "pt") {
     : (normalizarCelularUY(entrada) ?? normalizarCelularBR(entrada));
 }
 
-// Mesmo formato do cupom das contas (AGRO-7F3K), sem repetir nenhum dos dois
+// Mesmo formato do cupom das contas (AUTO-7F3K), sem repetir nenhum dos dois
 const ALFABETO = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
 async function novoCupom() {
   for (let i = 0; i < 8; i++) {
     const c =
-      "AGRO-" + Array.from({ length: 4 }, () => ALFABETO[randomInt(ALFABETO.length)]).join("");
+      "AUTO-" + Array.from({ length: 4 }, () => ALFABETO[randomInt(ALFABETO.length)]).join("");
     const [u, k] = await Promise.all([
       prisma.users.count({ where: { cupom: c } }),
       prisma.$queryRawUnsafe<unknown[]>(

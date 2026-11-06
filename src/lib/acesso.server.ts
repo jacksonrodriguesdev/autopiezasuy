@@ -76,7 +76,7 @@ export async function salvarConfigPopup(c: ConfigPopup) {
   }
 }
 
-// ---------- Cupom único (ex.: AGRO-7F3K) ----------
+// ---------- Cupom único (ex.: AUTO-7F3K) ----------
 const ALFABETO = "23456789ABCDEFGHJKMNPQRSTUVWXYZ"; // sem 0/O, 1/I/L
 
 export async function garantirCupom(userId: number): Promise<string | null> {
@@ -86,7 +86,7 @@ export async function garantirCupom(userId: number): Promise<string | null> {
   if (u.cupom) return u.cupom;
   for (let i = 0; i < 6; i++) {
     const codigo =
-      "AGRO-" + Array.from({ length: 4 }, () => ALFABETO[randomInt(ALFABETO.length)]).join("");
+      "AUTO-" + Array.from({ length: 4 }, () => ALFABETO[randomInt(ALFABETO.length)]).join("");
     try {
       await prisma.users.update({ where: { id: userId }, data: { cupom: codigo } });
       return codigo;
