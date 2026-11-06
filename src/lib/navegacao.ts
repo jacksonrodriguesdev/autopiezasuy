@@ -1,50 +1,51 @@
 import {
-  Cog,
-  Fuel,
-  Settings,
-  Disc3,
-  Zap,
-  CircleDot,
-  Car,
-  Bike,
-  Sparkles,
-  Thermometer,
-  Navigation,
-  Layers,
-  Droplets,
-  Wind,
-  Package,
-  Wrench,
-  ShieldCheck,
-  Hammer,
-  type LucideIcon,
-} from "lucide-react";
+  IconeMotor,
+  IconeFrenos,
+  IconeSuspension,
+  IconeInyeccion,
+  IconeTransmision,
+  IconeElectrica,
+  IconeEmbrague,
+  IconeDireccion,
+  IconeRefrigeracion,
+  IconeRodamientos,
+  IconeGomas,
+  IconeAccesorios,
+  IconeMotos,
+  IconeLubricacion,
+  IconeEscape,
+  IconeSeguridad,
+  IconeHerramientas,
+  IconeVarios,
+  type IconeAuto,
+} from "@/components/icones/IconesAuto";
 
 // Categorias principais (nomes iguais ao banco, para o filtro da loja funcionar), na ordem da home.
-export const CATEGORIAS: Array<{ nome: string; curto: string; icon: LucideIcon }> = [
-  { nome: "Motor", curto: "Motor", icon: Cog },
-  { nome: "Frenos", curto: "Frenos", icon: Disc3 },
-  { nome: "Suspensión", curto: "Suspensión", icon: Car },
-  { nome: "Inyección y Combustible", curto: "Inyección", icon: Fuel },
-  { nome: "Transmisión", curto: "Transmisión", icon: Settings },
-  { nome: "Eléctrica", curto: "Eléctrica", icon: Zap },
-  { nome: "Embrague", curto: "Embrague", icon: Layers },
-  { nome: "Dirección", curto: "Dirección", icon: Navigation },
-  { nome: "Refrigeración", curto: "Refrigeración", icon: Thermometer },
-  { nome: "Rodamientos", curto: "Rodamientos", icon: CircleDot },
-  { nome: "Gomas y Soportes", curto: "Gomas", icon: Package },
-  { nome: "Accesorios", curto: "Accesorios", icon: Sparkles },
-  { nome: "Motos", curto: "Motos", icon: Bike },
-  { nome: "Lubricación", curto: "Lubricación", icon: Droplets },
-  { nome: "Escape", curto: "Escape", icon: Wind },
-  { nome: "Seguridad", curto: "Seguridad", icon: ShieldCheck },
-  { nome: "Herramientas", curto: "Herramientas", icon: Hammer },
-  { nome: "Varios", curto: "Varios", icon: Wrench },
+// Ícones próprios (desenhos de peças): src/components/icones/IconesAuto.tsx
+export const CATEGORIAS: Array<{ nome: string; curto: string; icon: IconeAuto }> = [
+  { nome: "Motor", curto: "Motor", icon: IconeMotor },
+  { nome: "Frenos", curto: "Frenos", icon: IconeFrenos },
+  { nome: "Suspensión", curto: "Suspensión", icon: IconeSuspension },
+  { nome: "Inyección y Combustible", curto: "Inyección", icon: IconeInyeccion },
+  { nome: "Transmisión", curto: "Transmisión", icon: IconeTransmision },
+  { nome: "Eléctrica", curto: "Eléctrica", icon: IconeElectrica },
+  { nome: "Embrague", curto: "Embrague", icon: IconeEmbrague },
+  { nome: "Dirección", curto: "Dirección", icon: IconeDireccion },
+  { nome: "Refrigeración", curto: "Refrigeración", icon: IconeRefrigeracion },
+  { nome: "Rodamientos", curto: "Rodamientos", icon: IconeRodamientos },
+  { nome: "Gomas y Soportes", curto: "Gomas", icon: IconeGomas },
+  { nome: "Accesorios", curto: "Accesorios", icon: IconeAccesorios },
+  { nome: "Motos", curto: "Motos", icon: IconeMotos },
+  { nome: "Lubricación", curto: "Lubricación", icon: IconeLubricacion },
+  { nome: "Escape", curto: "Escape", icon: IconeEscape },
+  { nome: "Seguridad", curto: "Seguridad", icon: IconeSeguridad },
+  { nome: "Herramientas", curto: "Herramientas", icon: IconeHerramientas },
+  { nome: "Varios", curto: "Varios", icon: IconeVarios },
 ];
 
-export function iconeCategoria(nome: string): LucideIcon {
+export function iconeCategoria(nome: string): IconeAuto {
   const principal = nome.split(" > ")[0];
-  return CATEGORIAS.find((c) => c.nome === principal)?.icon ?? Package;
+  return CATEGORIAS.find((c) => c.nome === principal)?.icon ?? IconeVarios;
 }
 
 // Marcas de vehículos más buscadas en Uruguay (valor = campo `montadora` de pecas_aplicacao)

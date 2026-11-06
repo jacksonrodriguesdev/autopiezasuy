@@ -1,20 +1,19 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   Car,
   ChevronDown,
-  LayoutGrid,
   LogOut,
   MessageCircle,
   ShoppingCart,
   User,
-  ListChecks,
   Camera,
   X,
 } from "lucide-react";
 import { BarraCampanha, useCampanha } from "@/components/campanha/Campanha";
 import { SearchAutocomplete } from "@/components/SearchAutocomplete";
+import { IconeLista, IconeTodas } from "@/components/icones/IconesAuto";
 import { SinoNotificacoes } from "@/components/SinoNotificacoes";
 import { abrirFotoPieza } from "@/components/FotoPieza";
 import { useCart } from "@/components/CartContext";
@@ -50,6 +49,13 @@ export function SiteHeader() {
   const campanha = useCampanha();
   const black = campanha?.tema === "black";
   const navigate = useNavigate();
+  // Categoria aberta na loja (traço laranja na faixa)
+  const categoriaAtual = useRouterState({
+    select: (s) =>
+      s.location.pathname === "/loja"
+        ? String((s.location.search as { categoria?: unknown }).categoria ?? "")
+        : "",
+  });
 
   // Altura do header na variável --altura-header e no espaçador
   const headerRef = useRef<HTMLElement>(null);
@@ -320,37 +326,49 @@ export function SiteHeader() {
           />
         </div>
 
-        {/* Faixa de categorias: some ao rolar para baixo, volta ao rolar para cima */}
+        {/* Faixa de categorias (some ao rolar para baixo, volta ao rolar para cima): fundo
+            claro, ícones próprios de peças e um traço laranja embaixo da categoria aberta */}
         <nav
           aria-label="Categorías"
           className={cn(
-            "overflow-hidden transition-[max-height,opacity] duration-300",
-            black ? "bg-black" : "bg-primary",
-            hidden ? "max-h-0 opacity-0" : "max-h-12 opacity-100",
+            "overflow-hidden border-t transition-[max-height,opacity] duration-300",
+            black ? "border-white/10 bg-zinc-950" : "border-slate-200/80 bg-slate-50",
+            hidden ? "max-h-0 opacity-0" : "max-h-14 opacity-100",
           )}
         >
-          <div className="scrollbar-none mx-auto flex h-11 max-w-7xl items-center gap-1 overflow-x-auto px-3 text-[13px] font-medium text-white/85 md:px-4">
+          <div
+            className={cn(
+              "scrollbar-none mx-auto flex h-12 max-w-7xl items-stretch gap-0.5 overflow-x-auto px-3 text-[13px] font-semibold md:px-4",
+              black ? "text-white/80" : "text-slate-600",
+            )}
+          >
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-full bg-white/10 px-3 font-semibold text-white outline-none transition hover:bg-white/20">
-                <LayoutGrid className="h-4 w-4" /> Categorías
-                <ChevronDown className="h-3.5 w-3.5 opacity-70" />
+              <DropdownMenuTrigger className="my-2 mr-2 flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-orange-500 pl-2.5 pr-3 font-bold text-white shadow-sm shadow-orange-500/30 outline-none transition hover:bg-orange-600">
+                <IconeTodas className="h-[18px] w-[18px]" />
+                <span className="hidden sm:inline">Todas las categorías</span>
+                <span className="sm:hidden">Categorías</span>
+                <ChevronDown className="h-3.5 w-3.5 opacity-80" />
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="start"
-                className="grid w-[min(92vw,520px)] grid-cols-2 gap-0.5 p-2"
+                className="grid w-[min(94vw,600px)] grid-cols-2 gap-1 rounded-2xl p-2.5 sm:grid-cols-3"
               >
                 {categorias.map((c) => (
                   <DropdownMenuItem
                     key={c.nome}
                     asChild
-                    className="cursor-pointer gap-2.5 rounded-lg py-2"
+                    className="cursor-pointer flex-col items-start gap-1.5 rounded-xl p-3 focus:bg-orange-50"
                   >
                     <Link to="/loja" search={{ categoria: c.nome } as never}>
-                      <c.icon className="h-4 w-4 text-primary" />
-                      <span className="flex-1">{c.rotulo}</span>
+                      <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0b1d3a] text-amber-400">
+                        <c.icon className="h-5 w-5" />
+                      </span>
+                      <span className="text-[13px] font-bold leading-tight text-slate-800">
+                        {c.rotulo}
+                      </span>
                       {c.total > 0 && (
-                        <span className="text-[11px] text-zinc-400">
-                          {c.total.toLocaleString("es-UY")}
+                        <span className="text-[11px] text-slate-400">
+                          {c.total.toLocaleString("es-UY")} piezas
                         </span>
                       )}
                     </Link>
@@ -358,40 +376,61 @@ export function SiteHeader() {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-            {categorias.slice(0, 8).map((c, i) => (
-              <Link
-                key={c.nome}
-                to="/loja"
-                search={{ categoria: c.nome } as never}
-                className={cn(
-                  "shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 transition hover:bg-white/10 hover:text-white",
-                  // Celular: todas (a faixa rola); computador: 6 até 1536px, 8 acima
-                  i < 6 ? "flex" : "flex md:hidden 2xl:flex",
-                )}
-              >
-                <c.icon className="h-3.5 w-3.5 opacity-80" />
-                {c.curto}
-              </Link>
-            ))}
+            {categorias.slice(0, 8).map((c, i) => {
+              const ativa = categoriaAtual === c.nome;
+              return (
+                <Link
+                  key={c.nome}
+                  to="/loja"
+                  search={{ categoria: c.nome } as never}
+                  className={cn(
+                    "group relative shrink-0 items-center gap-2 px-3 transition",
+                    // Celular: todas (a faixa rola); computador: 6 até 1536px, 8 acima
+                    i < 6 ? "flex" : "flex md:hidden 2xl:flex",
+                    ativa
+                      ? black
+                        ? "text-white"
+                        : "text-[#0b1d3a]"
+                      : black
+                        ? "hover:text-white"
+                        : "hover:text-[#0b1d3a]",
+                  )}
+                >
+                  <c.icon
+                    className={cn(
+                      "h-[18px] w-[18px] transition",
+                      ativa ? "text-orange-500" : "text-slate-400 group-hover:text-orange-500",
+                    )}
+                  />
+                  {c.curto}
+                  <span
+                    className={cn(
+                      "absolute inset-x-3 bottom-0 h-[3px] rounded-t-full bg-orange-500 transition-transform",
+                      ativa ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100",
+                    )}
+                  />
+                </Link>
+              );
+            })}
             <div className="min-w-4 flex-1" />
             <button
               type="button"
               onClick={abrirFotoPieza}
-              className="hidden shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 transition hover:bg-white/10 hover:text-white 2xl:flex"
+              className="hidden shrink-0 items-center gap-1.5 px-3 transition hover:text-[#0b1d3a] 2xl:flex"
             >
-              <Camera className="h-3.5 w-3.5" /> ¿Sin código?
+              <Camera className="h-4 w-4 text-slate-400" /> ¿Sin código?
             </button>
             <Link
               to="/pedido-rapido"
-              className="hidden shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 transition hover:bg-white/10 hover:text-white lg:flex"
+              className="my-2 hidden shrink-0 items-center gap-1.5 rounded-xl px-3 ring-1 ring-slate-300 transition hover:bg-white hover:text-[#0b1d3a] hover:ring-[#0b1d3a] lg:flex"
             >
-              <ListChecks className="h-3.5 w-3.5" /> Pedido rápido
+              <IconeLista className="h-4 w-4" /> Pedido rápido
             </Link>
             <Link
               to="/cotizar"
-              className="flex shrink-0 items-center gap-1.5 rounded-full bg-accent px-3.5 py-1.5 font-bold text-white transition hover:brightness-110"
+              className="my-2 ml-1.5 flex shrink-0 items-center gap-1.5 rounded-xl bg-[#0b1d3a] px-3.5 font-bold text-white transition hover:bg-[#13294f]"
             >
-              Cotizar
+              <MessageCircle className="h-4 w-4 text-emerald-400" /> Cotizar
             </Link>
           </div>
         </nav>

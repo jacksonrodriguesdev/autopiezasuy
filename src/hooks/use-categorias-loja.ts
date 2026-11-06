@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Package, type LucideIcon } from "lucide-react";
+import { IconeVarios, type IconeAuto } from "@/components/icones/IconesAuto";
 import { listCategories } from "@/lib/categories";
 import { CATEGORIAS } from "@/lib/navegacao";
 import { useIdioma, type Idioma } from "@/lib/idioma";
@@ -16,7 +16,7 @@ export type CategoriaLoja = {
   nome: string;
   rotulo: string;
   curto: string;
-  icon: LucideIcon;
+  icon: IconeAuto;
   imagem: string | null;
   total: number;
 };
@@ -55,7 +55,7 @@ export function useCategoriasLoja(): CategoriaLoja[] {
         nome: c.nome as string,
         rotulo: categoriaRotulo(c.nome, idioma),
         curto: categoriaCurta(c.nome, idioma),
-        icon: conhecida?.icon ?? Package,
+        icon: conhecida?.icon ?? IconeVarios,
         imagem: c.image_path ? urlImagem(c.image_path) : null,
         total: (c.totalProducts as number) ?? 0,
       };
