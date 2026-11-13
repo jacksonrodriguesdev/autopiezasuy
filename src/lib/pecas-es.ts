@@ -647,6 +647,18 @@ const GLOSSARIO: Record<string, string> = {
   ESTACIONADO: "ESTACIONAMIENTO",
   VEDANTE: "SELLADOR",
   ENGRAXADEIRA: "ALEMITE",
+  // Autos: palavras que faltavam (vela de ignição = bujía no Uruguai)
+  VELA: "BUJÍA",
+  VELAS: "BUJÍAS",
+  SUSPENSAO: "SUSPENSIÓN",
+  ESCRAVO: "ESCLAVO",
+  TERMOSTATICA: "TERMOSTÁTICA",
+  TERMOSTATICO: "TERMOSTÁTICO",
+  HOMOCINETICO: "HOMOCINÉTICO",
+  HOMOCINETICA: "HOMOCINÉTICA",
+  ANALISADOR: "ANALIZADOR",
+  FUMACA: "HUMO",
+  TRIPECA: "TRÍPODE",
 };
 
 // Abreviações e palavras que só existem em português; usadas também na busca ao contrário.

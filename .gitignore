@@ -65,3 +65,6 @@ dados/precos_agrotrator/
 # Verificação automática (scripts/ci)
 .ci-uploads/
 servidor.log
+
+# Posts gerados para redes sociais (scripts/marketing)
+marketing/

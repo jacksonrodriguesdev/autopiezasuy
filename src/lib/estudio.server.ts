@@ -8,14 +8,23 @@
 
 const DIA = 86_400_000;
 
-// Fotos próprias: as do catálogo no Cloudflare R2 (…r2.dev/fotos/SKU_n.jpg) e as enviadas pelo
-// admin (uploads/produtos/…). Logos e fotos de outros sites não contam.
-export const fotoPropria = (u: string | null | undefined) =>
-  !!u &&
-  (/^https:\/\/[^/]+\.r2\.dev\/fotos\/[^/]/.test(u.trim()) ||
-    /^(uploads\/)?produtos\/[^/]/.test(u.trim().replace(/^\//, "")));
+// Fotos próprias: as do catálogo no Cloudflare R2 (<endereço do bucket>/fotos/SKU_n.jpg, seja
+// r2.dev ou domínio próprio) e as enviadas pelo admin (uploads/produtos/…).
+const HOST_FOTOS = (() => {
+  try {
+    return new URL(import.meta.env?.VITE_FOTOS_URL || process.env.VITE_FOTOS_URL || "").host;
+  } catch {
+    return "";
+  }
+})();
+export const fotoPropria = (u: string | null | undefined) => {
+  if (!u) return false;
+  const m = u.trim().match(/^https:\/\/([^/]+)\/fotos\/[^/]/);
+  if (m) return m[1].endsWith(".r2.dev") || m[1] === HOST_FOTOS;
+  return /^(uploads\/)?produtos\/[^/]/.test(u.trim().replace(/^\//, ""));
+};
 // Filtro do Prisma: peça com foto do catálogo (R2)
-export const ONDE_FOTO_PROPRIA = { imagem_principal: { contains: ".r2.dev/fotos/" } };
+export const ONDE_FOTO_PROPRIA = { imagem_principal: { contains: "/fotos/" } };
 
 const normal = (s: string) =>
   s
